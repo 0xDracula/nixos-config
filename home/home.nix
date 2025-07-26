@@ -81,7 +81,7 @@ in
 
   programs.git = {
     enable = true;
-    userName = "Abdallah Ebrahim";
+    userName = "0xDracula";
     userEmail = "abdallah.ebrahim.official@gmail.com";
   };
   programs.spicetify =
