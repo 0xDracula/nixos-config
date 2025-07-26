@@ -86,5 +86,7 @@
     
     xmind
     linux-wifi-hotspot
+    logseq
+    jupyter-all
   ];
 }

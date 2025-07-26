@@ -77,6 +77,16 @@
   
   };
 
+  boot.kernelParams = ["resume_offset=77438976"];
+  boot.resumeDevice = "/dev/disk/by-label/root";
+
+  swapDevices = [ 
+   {
+     device ="/var/lib/swapfile";
+     size = 16 * 1024;
+   }
+  ];
+
   networking.hostName = "nixos";
 
   networking.networkmanager.enable = true;
@@ -130,5 +140,6 @@
   systemd.packages = [ pkgs.cloudflare-warp ];
   systemd.targets.multi-user.wants = [ "warp-svc.service" ];
   programs.steam.enable = true;
+  programs.gamemode.enable = true;
   system.stateVersion = "25.05";
 }
