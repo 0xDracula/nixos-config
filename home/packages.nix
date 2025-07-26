@@ -88,5 +88,6 @@
     linux-wifi-hotspot
     logseq
     jupyter-all
+    qbittorrent-enhanced
   ];
 }
