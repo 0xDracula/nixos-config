@@ -89,5 +89,7 @@
     logseq
     jupyter-all
     qbittorrent-enhanced
+  
+    gnomeExtensions.appindicator
   ];
 }
