@@ -134,6 +134,8 @@
     bibata-cursors
     wireguard-tools
     protonvpn-gui
+    ffmpeg-full
+    hunspell
   ];
   systemd.packages = [ pkgs.cloudflare-warp ];
   systemd.targets.multi-user.wants = [ "warp-svc.service" ];

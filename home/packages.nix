@@ -91,5 +91,8 @@
     qbittorrent-enhanced
   
     gnomeExtensions.appindicator
+    
+    anki-bin
+    fastfetch
   ];
 }

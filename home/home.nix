@@ -150,11 +150,19 @@ in
   stylix.targets.zen-browser.profileNames = [ "dracula" ];
   stylix.targets.vscode.enable = true;
   stylix.targets.qt.platform = "qtct";
-  programs.fish.enable = true;
+  programs.fish = {
+    enable = true;
+    shellInit = ''
+        set fish_greeting ""
+        fastfetch
+    '';
+
+  };
   programs.kitty = {
     enable = true;
     settings = {
       window_padding_width = 15;
+      # hide_window_decorations = true;
     };
   };
   programs.ranger.enable = true;
