@@ -79,7 +79,7 @@
 
   boot.kernelParams = ["resume_offset=77438976"];
   boot.resumeDevice = "/dev/disk/by-label/root";
-
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   swapDevices = [ 
    {
      device ="/var/lib/swapfile";
@@ -91,11 +91,10 @@
 
   networking.networkmanager.enable = true;
 
-  #services.xserver.enable = true;
+  services.xserver.enable = false;
   services.displayManager.gdm.enable = true;
-  #services.displayManager.sddm.wayland.enable = true;
+  services.displayManager.gdm.wayland = true;
   services.desktopManager.gnome.enable = true;
-  #services.xserver.desktopManager.plasma5.enable = true;  
   
   programs.hyprland = {
     enable = true;
@@ -116,7 +115,6 @@
   xdg.portal.enable = true;
   services.xserver.xkb = {
     layout = "us";
-    variant = "";
   };
 
   environment.systemPackages = with pkgs; [

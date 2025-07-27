@@ -42,6 +42,9 @@ in
         appindicator.extensionUuid
       ];
     };
+    settings."org/gnome/desktop/peripherals/touchpad" = {
+      two-finger-scrolling-enabled = true;
+    };
   };
 
   programs.starship = {
