@@ -20,9 +20,7 @@
     # You can also split up your configuration and import pieces of it here:
     # ./users.nix
 
-    # Import your generated (nixos-generate-config) hardware configuration
-    #inputs.self.nixosModules.stylix
-   
+    # Import your generated (nixos-generate-config) hardware configuration   
     ./modules
     ./hardware-configuration.nix
   ];
@@ -94,11 +92,12 @@
 
   services.xserver.enable = true;
   
-  services.displayManager.sddm.enable = true;
-  #services.displayManager.gdm.wayland = true;
-  #services.desktopManager.gnome.enable = true;
-  services.desktopManager.plasma6.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.displayManager.gdm.wayland = true;
+  services.desktopManager.gnome.enable = true;
+  #services.desktopManager.plasma6.enable = true;
   
+  # stylix.enable = true;
 
   services.flatpak.enable = true;
   services.espanso = {
