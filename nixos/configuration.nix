@@ -21,7 +21,8 @@
     # ./users.nix
 
     # Import your generated (nixos-generate-config) hardware configuration
-    inputs.self.nixosModules.stylix
+    #inputs.self.nixosModules.stylix
+   
     ./modules
     ./hardware-configuration.nix
   ];
@@ -91,23 +92,23 @@
 
   networking.networkmanager.enable = true;
 
-  services.xserver.enable = false;
-  services.displayManager.gdm.enable = true;
-  services.displayManager.gdm.wayland = true;
-  services.desktopManager.gnome.enable = true;
+  services.xserver.enable = true;
   
-  programs.hyprland = {
-    enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-  };
+  services.displayManager.sddm.enable = true;
+  #services.displayManager.gdm.wayland = true;
+  #services.desktopManager.gnome.enable = true;
+  services.desktopManager.plasma6.enable = true;
+  
 
   services.flatpak.enable = true;
-  
+  services.espanso = {
+    enable = true;
+    package = pkgs.espanso-wayland;
+  };  
   users.users = {
     dracula = {
       isNormalUser = true;
-      extraGroups = ["wheel" "networkmanager" "gamemode"];
+      extraGroups = ["input" "wheel" "networkmanager" "gamemode"];
     };
   };
 
@@ -136,10 +137,14 @@
     protonvpn-gui
     ffmpeg-full
     hunspell
+    xdg-desktop-portal-gnome
+    flameshot
   ];
   systemd.packages = [ pkgs.cloudflare-warp ];
   systemd.targets.multi-user.wants = [ "warp-svc.service" ];
+  
   programs.steam.enable = true;
-  programs.gamemode.enable = true;
+  programs.gamescope.enable = true;
+
   system.stateVersion = "25.05";
 }

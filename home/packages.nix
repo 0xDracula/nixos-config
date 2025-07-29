@@ -94,5 +94,7 @@
     
     anki-bin
     fastfetch
+    smile
   ];
+
 }

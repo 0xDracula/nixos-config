@@ -1,5 +1,4 @@
 {
-  nix-config,
   config,
   pkgs,
   ...
@@ -14,7 +13,9 @@ in
     enable = true;
     image = ./wallpaper.jpg;
     polarity = "dark";
-
+    targets = {
+      qt.enable = false;
+    };
     opacity = {
       terminal = opacity;
       popups = opacity;

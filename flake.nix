@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    # nixpkgs-stable.url = "github:nixos/nixpkgs/nixos";
     
     home-manager = {
       url = "github:nix-community/home-manager/master";
@@ -25,15 +25,16 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
-
-    hyprland.url = "github:hyprwm/Hyprland";
-
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    espanso-fix.url = "github:pitkling/nixpkgs/espanso-fix-capabilities-export";
   };
   outputs = {
     self,
     nixpkgs,
     home-manager,
     stylix,
+    espanso-fix,
+    nixos-hardware,
     ...
   } @ inputs: let
    inherit (nixpkgs.lib) genAttrs replaceStrings;
@@ -52,9 +53,9 @@
 
     overlays = import ./overlays {inherit inputs;};
     
-    nixosModules = genAttrs (map nameOf (listFilesRecursive ./modules)) (
-      name: import ./modules/nixos/${name}.nix
-    );
+    #nixosModules = genAttrs (map nameOf (listFilesRecursive ./modules)) (
+      #name: import ./modules/nixos/${name}.nix
+    #);
     homeManagerModules = import ./modules/home;
 
     nixosConfigurations = {
@@ -62,11 +63,17 @@
         specialArgs = {inherit inputs outputs; nix-config = self;};
         modules = [
           stylix.nixosModules.stylix
+          espanso-fix.nixosModules.espanso-capdacoverride
           ./nixos/configuration.nix
+          nixos-hardware.nixosModules.common-cpu-intel
+          nixos-hardware.nixosModules.common-gpu-nvidia
+          nixos-hardware.nixosModules.common-pc-laptop
+          nixos-hardware.nixosModules.common-pc-laptop-ssd
           home-manager.nixosModules.home-manager
             {
               home-manager.users.dracula = ./home/home.nix;
               home-manager.extraSpecialArgs = { inherit inputs outputs; };
+              home-manager.backupFileExtension = "backup";
             }
         ];
       };

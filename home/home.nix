@@ -9,6 +9,7 @@
 }: 
 let
   spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.system};
+  flameshot-gui = pkgs.writeShellScriptBin "flameshot-gui" "${pkgs.flameshot}/bin/flameshot gui";
 in
 {
   imports = [
@@ -44,6 +45,32 @@ in
     };
     settings."org/gnome/desktop/peripherals/touchpad" = {
       two-finger-scrolling-enabled = true;
+    };
+    settings."org/gnome/shell/keybindings" = {
+      show-screenshot-ui = [ ];
+    };
+
+    settings."org/gnome/settings-daemon/plugins/media-keys" = {
+      custom-keybindings = [ 
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/"
+      ];
+    };
+    settings."org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+      binding = "<Super><Shift>s";
+      command = "${flameshot-gui}/bin/flameshot-gui";
+      name = "Flameshot";
+    };
+    settings."org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
+      binding = "<Super>q";
+      command = "kitty";
+      name = "Kitty";
+    };
+    settings."org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2" = {
+      binding = "<Super>,";
+      command = "smile";
+      name = "Smile";
     };
   };
 
@@ -147,9 +174,9 @@ in
      };
 
   };
-  stylix.targets.zen-browser.profileNames = [ "dracula" ];
-  stylix.targets.vscode.enable = true;
-  stylix.targets.qt.platform = "qtct";
+  #stylix.targets.zen-browser.profileNames = [ "dracula" ];
+  #stylix.targets.vscode.enable = true;
+  #stylix.targets.qt.platform = "qtct";
   programs.fish = {
     enable = true;
     shellInit = ''
@@ -168,6 +195,6 @@ in
   programs.ranger.enable = true;
   programs.chromium.enable = true;
   systemd.user.startServices = "sd-switch";
-
+  
   home.stateVersion = "25.05";
 }
