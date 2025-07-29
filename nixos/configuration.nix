@@ -6,6 +6,7 @@
   lib,
   config,
   pkgs,
+  stylix,
   ...
 }: {
   # You can import other NixOS modules here
@@ -92,12 +93,12 @@
 
   services.xserver.enable = true;
   
-  services.displayManager.sddm.enable = true;
-  #services.displayManager.gdm.wayland = true;
-  #services.desktopManager.gnome.enable = true;
-  services.desktopManager.plasma6.enable = true;
+  #services.displayManager.sddm.enable = true;
+  services.displayManager.gdm.wayland = true;
+  services.desktopManager.gnome.enable = true;
+  #services.desktopManager.plasma6.enable = true;
   
-  # stylix.enable = true;
+  stylix.enable = true;
 
   services.flatpak.enable = true;
   services.espanso = {

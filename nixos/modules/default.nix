@@ -3,6 +3,6 @@
   imports = [
     ./core
     ./hardware
-    ./stylix
+    #./stylix
   ];
 }
