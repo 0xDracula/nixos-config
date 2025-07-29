@@ -2,6 +2,6 @@
 {
   imports = [
     ./hardware.nix
-    ./gpu.nix
+    #./gpu.nix
   ];
 }

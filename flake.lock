@@ -67,22 +67,6 @@
         "type": "github"
       }
     },
-    "espanso-fix": {
-      "locked": {
-        "lastModified": 1736868948,
-        "narHash": "sha256-MD+uHLrcvG6MaUVsZF6gbz232/6NYSizGP5VUHVJKCs=",
-        "owner": "pitkling",
-        "repo": "nixpkgs",
-        "rev": "c006215b2c8ac66586a8de974292289a8372abc4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "pitkling",
-        "ref": "espanso-fix-capabilities-export",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "firefox-gnome-theme": {
       "flake": false,
       "locked": {
@@ -218,11 +202,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1753818448,
-        "narHash": "sha256-Z9WzU2+S3z4QZ/LGcivBY4cf2aG0VYiRmgeAsdegXY0=",
+        "lastModified": 1753825287,
+        "narHash": "sha256-axdksEaJBRj6PReTwpOILL6sgvvCsOPGPy32FnFFSMo=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "b108e6b7f75d2767a1a559345689e7bedfe7dd11",
+        "rev": "4bf124678be14242e916f4dec2596158900780d4",
         "type": "github"
       },
       "original": {
@@ -368,7 +352,6 @@
     },
     "root": {
       "inputs": {
-        "espanso-fix": "espanso-fix",
         "home-manager": "home-manager",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",

@@ -26,14 +26,12 @@
       };
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    espanso-fix.url = "github:pitkling/nixpkgs/espanso-fix-capabilities-export";
   };
   outputs = {
     self,
     nixpkgs,
     home-manager,
     stylix,
-    espanso-fix,
     nixos-hardware,
     ...
   } @ inputs: let
@@ -63,7 +61,6 @@
         specialArgs = {inherit inputs outputs; nix-config = self;};
         modules = [
           stylix.nixosModules.stylix
-          espanso-fix.nixosModules.espanso-capdacoverride
           ./nixos/configuration.nix
           nixos-hardware.nixosModules.common-cpu-intel
           nixos-hardware.nixosModules.common-gpu-nvidia

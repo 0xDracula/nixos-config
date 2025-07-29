@@ -79,7 +79,7 @@
 
   boot.kernelParams = ["resume_offset=77438976"];
   boot.resumeDevice = "/dev/disk/by-label/root";
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_zen;
   swapDevices = [ 
    {
      device ="/var/lib/swapfile";
@@ -93,18 +93,16 @@
 
   services.xserver.enable = true;
   
-  #services.displayManager.sddm.enable = true;
-  services.displayManager.gdm.wayland = true;
-  services.desktopManager.gnome.enable = true;
-  #services.desktopManager.plasma6.enable = true;
+  services.displayManager.sddm.enable = true;
+  #services.displayManager.gdm.wayland = true;
+  #services.desktopManager.gnome.enable = true;
+  services.desktopManager.plasma6.enable = true;
+  services.displayManager.sddm.wayland.enable = true; 
   
   stylix.enable = true;
+  stylix.image = ./modules/stylix/wallpaper.jpg;
 
   services.flatpak.enable = true;
-  services.espanso = {
-    enable = true;
-    package = pkgs.espanso-wayland;
-  };  
   users.users = {
     dracula = {
       isNormalUser = true;
@@ -117,6 +115,10 @@
   services.xserver.xkb = {
     layout = "us";
   };
+  
+  environment.plasma6.excludePackages = with pkgs.kdePackages; [
+    drkonqi
+  ];
 
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
@@ -131,18 +133,16 @@
     gtk3
     gtk4
     gnome-tweaks
-    cloudflare-warp
     bibata-cursors
     wireguard-tools
     protonvpn-gui
     ffmpeg-full
     hunspell
-    xdg-desktop-portal-gnome
+    #xdg-desktop-portal-gnome
     flameshot
   ];
-  systemd.packages = [ pkgs.cloudflare-warp ];
-  systemd.targets.multi-user.wants = [ "warp-svc.service" ];
   
+  services.cloudflare-warp.enable = true;  
   programs.steam.enable = true;
   programs.gamescope.enable = true;
 
