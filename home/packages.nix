@@ -42,7 +42,7 @@
     zstd
     gnupg
 
-    vscode
+    #vscode
 
     # nix related
     #
@@ -95,6 +95,9 @@
     anki-bin
     fastfetch
     smile
+
+    jetbrains.idea-community-bin
+    jdk
   ];
 
 }

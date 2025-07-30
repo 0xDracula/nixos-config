@@ -25,6 +25,11 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
   outputs = {
@@ -33,6 +38,7 @@
     home-manager,
     stylix,
     nixos-hardware,
+    plasma-manager,
     ...
   } @ inputs: let
    inherit (nixpkgs.lib) genAttrs replaceStrings;
@@ -68,9 +74,10 @@
           nixos-hardware.nixosModules.common-pc-laptop-ssd
           home-manager.nixosModules.home-manager
             {
-              home-manager.users.dracula = ./home/home.nix;
+              home-manager.sharedModules = [ plasma-manager.homeManagerModules.plasma-manager ];
               home-manager.extraSpecialArgs = { inherit inputs outputs; };
               home-manager.backupFileExtension = "backup";
+              home-manager.users.dracula = ./home/home.nix;
             }
         ];
       };

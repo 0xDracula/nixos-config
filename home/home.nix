@@ -13,6 +13,7 @@ in
 {
   imports = [
     ./packages.nix
+    ./plasma.nix
     inputs.spicetify-nix.homeManagerModules.default 
     inputs.zen-browser.homeModules.twilight
     inputs.nvf.homeManagerModules.default
@@ -73,6 +74,7 @@ in
     };
   };
 
+
   programs.starship = {
     enable = true;
     # custom settings
@@ -117,7 +119,10 @@ in
       fi
     '';
   };
-
+  stylix.targets.spicetify.enable = false;
+  stylix.targets.vscode.enable = false;
+  
+  programs.vscode.enable = true;
   programs.git = {
     enable = true;
     userName = "0xDracula";
@@ -173,9 +178,7 @@ in
      };
 
   };
-  #stylix.targets.zen-browser.profileNames = [ "dracula" ];
-  #stylix.targets.vscode.enable = true;
-  #stylix.targets.qt.platform = "qtct";
+  
   programs.fish = {
     enable = true;
     shellInit = ''
@@ -184,6 +187,7 @@ in
     '';
 
   };
+
   programs.kitty = {
     enable = true;
     settings = {

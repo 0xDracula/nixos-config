@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  stylix,
   ...
 }:
 
@@ -13,9 +14,6 @@ in
     enable = true;
     image = ./wallpaper.jpg;
     polarity = "dark";
-    targets = {
-      qt.enable = false;
-    };
     opacity = {
       terminal = opacity;
       popups = opacity;

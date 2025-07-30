@@ -79,7 +79,7 @@
 
   boot.kernelParams = ["resume_offset=77438976"];
   boot.resumeDevice = "/dev/disk/by-label/root";
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   swapDevices = [ 
    {
      device ="/var/lib/swapfile";
@@ -99,9 +99,32 @@
   services.desktopManager.plasma6.enable = true;
   services.displayManager.sddm.wayland.enable = true; 
   
-  stylix.enable = true;
-  stylix.image = ./modules/stylix/wallpaper.jpg;
+  # stylix.enable = true;
+  # stylix.image = ./modules/stylix/wallpaper.jpg;
+  # stylix.cursor = {
+  #   package = pkgs.bibata-cursors;
+  #   name = "Bibata-Modern-Ice";
+  #   size = 24;
+  # };
+  # stylix.opacity = {
+  #   terminal = 0.95;
+  #   popups = 95;
+  # };
+  # stylix.polarity = "dark";
+  # stylix.fonts = {
+  #   emoji = {
+  #     package = pkgs.noto-fonts-color-emoji;
+  #     name = "Noto Color Emoji";
+  #   };
 
+  #   sizes = {
+  #     applications = 12;
+  #     desktop = 12;
+  #     popups = 12;
+  #     terminal = 12;
+  #   };
+  # };
+  
   services.flatpak.enable = true;
   users.users = {
     dracula = {
@@ -140,9 +163,17 @@
     hunspell
     #xdg-desktop-portal-gnome
     flameshot
+    quickemu
   ];
   
   services.cloudflare-warp.enable = true;  
+  systemd.user.services.warp-taskbar = {
+    enable = false;
+    wantedBy = lib.mkForce [ ]; # forcibly clears wantedBy
+    unitConfig = {
+      ConditionPathExists = "/nonexistent"; # optional extra block to ensure it can't run
+    };
+  };
   programs.steam.enable = true;
   programs.gamescope.enable = true;
 
