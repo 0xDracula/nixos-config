@@ -5,7 +5,6 @@
     # here is some command line tools I use frequently
     # feel free to add your own or remove some of them
 
-    neofetch
     nnn # terminal file manager
 
     # archives
@@ -76,7 +75,6 @@
     libreoffice-qt6
     vesktop
     tmux
-    whatsie
     obsidian
     obs-studio
     dnsmasq
@@ -84,17 +82,12 @@
     telegram-desktop
     altus
     
-    xmind
     linux-wifi-hotspot
-    logseq
     jupyter-all
     qbittorrent-enhanced
   
-    gnomeExtensions.appindicator
-    
     anki-bin
     fastfetch
-    smile
 
     jetbrains.idea-community-bin
     element-desktop
