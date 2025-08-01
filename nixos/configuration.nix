@@ -165,7 +165,7 @@
     flameshot
     quickemu
   ];
-  
+  services.playerctld.enable = true; 
   services.cloudflare-warp.enable = true;  
   systemd.user.services.warp-taskbar = {
     enable = false;
