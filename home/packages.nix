@@ -97,7 +97,7 @@
     smile
 
     jetbrains.idea-community-bin
-    jdk
+    element-desktop
   ];
 
 }

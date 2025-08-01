@@ -31,6 +31,7 @@
       inputs.home-manager.follows = "home-manager";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    prismlauncher.url = "github:0xDracula/PrismLauncher";
   };
   outputs = {
     self,
@@ -39,6 +40,7 @@
     stylix,
     nixos-hardware,
     plasma-manager,
+    prismlauncher,
     ...
   } @ inputs: let
    inherit (nixpkgs.lib) genAttrs replaceStrings;
@@ -66,6 +68,12 @@
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs; nix-config = self;};
         modules = [
+          (
+            { pkgs, ... }:
+            {
+              environment.systemPackages = [ prismlauncher.packages.${pkgs.system}.prismlauncher ];
+            }
+          )
           stylix.nixosModules.stylix
           ./nixos/configuration.nix
           nixos-hardware.nixosModules.common-cpu-intel

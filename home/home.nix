@@ -73,8 +73,7 @@ in
       name = "Smile";
     };
   };
-
-
+  
   programs.starship = {
     enable = true;
     # custom settings
@@ -104,6 +103,11 @@ in
       selection.save_to_clipboard = true;
     };
   };
+  
+  programs.java = {
+    enable = true;
+    package = pkgs.jdk.override { enableJavaFX = true; };
+  };
 
   programs.bash = {
     enable = true;
@@ -121,6 +125,7 @@ in
   };
   stylix.targets.spicetify.enable = false;
   stylix.targets.vscode.enable = false;
+  stylix.targets.zen-browser.profileNames = [ "dracula" ];
   
   programs.vscode.enable = true;
   programs.git = {
@@ -142,14 +147,11 @@ in
       beautifulLyrics
       oneko
     ];
-    enabledCustomApps = with spicePkgs.apps; [
-      newReleases
-      ncsVisualizer
-    ];
     enabledSnippets = with spicePkgs.snippets; [
       rotatingCoverart
       pointer
     ];
+    theme = spicePkgs.themes.text;
   };
   
   programs.nvf = {
@@ -193,6 +195,7 @@ in
     settings = {
       window_padding_width = 15;
       # hide_window_decorations = true;
+      background_blur = 10;
     };
   };
   programs.ranger.enable = true;
