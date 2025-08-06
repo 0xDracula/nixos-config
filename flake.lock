@@ -181,11 +181,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1753983724,
-        "narHash": "sha256-2vlAOJv4lBrE+P1uOGhZ1symyjXTRdn/mz0tZ6faQcg=",
+        "lastModified": 1754085240,
+        "narHash": "sha256-kVHCrTWEe8B1thAhFag1bk4QPY0ZP45V9vPbrwPHoNo=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "7035020a507ed616e2b20c61491ae3eaa8e5462c",
+        "rev": "e102920c1becb114645c6f92fe14edc0b05cc229",
         "type": "github"
       },
       "original": {
@@ -265,11 +265,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1753694789,
-        "narHash": "sha256-cKgvtz6fKuK1Xr5LQW/zOUiAC0oSQoA9nOISB0pJZqM=",
+        "lastModified": 1753939845,
+        "narHash": "sha256-K2ViRJfdVGE8tpJejs8Qpvvejks1+A4GQej/lBk5y7I=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "dc9637876d0dcc8c9e5e22986b857632effeb727",
+        "rev": "94def634a20494ee057c76998843c015909d6311",
         "type": "github"
       },
       "original": {
@@ -390,11 +390,11 @@
         "qrcodegenerator": "qrcodegenerator"
       },
       "locked": {
-        "lastModified": 1753984618,
-        "narHash": "sha256-EPWl1LwIo33H+ey57o64fcId8NHJJJlgZ7qAnFspU/s=",
+        "lastModified": 1754045514,
+        "narHash": "sha256-AjR55EAWauIdMOwzEVLovNGnLk3Awp7Cyea0md6KIHk=",
         "owner": "0xDracula",
         "repo": "PrismLauncher",
-        "rev": "c34769caf2050751136c50596c63b5547fde5610",
+        "rev": "9263594900fbe4dd87d9a5a13cf4a0607a763720",
         "type": "github"
       },
       "original": {
@@ -427,9 +427,30 @@
         "nvf": "nvf",
         "plasma-manager": "plasma-manager",
         "prismlauncher": "prismlauncher",
+        "silentSDDM": "silentSDDM",
         "spicetify-nix": "spicetify-nix",
         "stylix": "stylix",
         "zen-browser": "zen-browser"
+      }
+    },
+    "silentSDDM": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1754081157,
+        "narHash": "sha256-NnAc8FaMtQj7aNNKC/B40E0/Awo4U0xDaiQ4EK/zcqQ=",
+        "owner": "uiriansan",
+        "repo": "SilentSDDM",
+        "rev": "6e4507e780995320f36ebbf414df218583e87380",
+        "type": "github"
+      },
+      "original": {
+        "owner": "uiriansan",
+        "repo": "SilentSDDM",
+        "type": "github"
       }
     },
     "spicetify-nix": {

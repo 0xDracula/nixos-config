@@ -7,20 +7,21 @@
         "Capture" = "Meta+Shift+S";
       };
     };
-    hotkeys.commands = {
-      "playerctl-next" = {
-         name = "Playerctl Next";
-         key = "CTRL+Right";
-         command = "playerctl --player=spotify,%any next";
-         logs.enabled = false;
-      };
-      "playerctl-previous" = {
-         name = "Playerctl Previous";
-         key = "CTRL+Left";
-         command = "playerctl --player=spotify,%any previous";
-         logs.enabled = false;
-      };
-    };
+    # Commented until I find a fix to only use shortcuts while focus on spotify....
+    #hotkeys.commands = {
+      #"playerctl-next" = {
+         #name = "Playerctl Next";
+         #key = "CTRL+Right";
+         #command = "playerctl --player=spotify,%any next";
+         #logs.enabled = false;
+      #};
+      #"playerctl-previous" = {
+         #name = "Playerctl Previous";
+         #key = "CTRL+Left";
+         #command = "playerctl --player=spotify,%any previous";
+         #logs.enabled = false;
+      #};
+    #};
     input = {
       touchpads = [
         {

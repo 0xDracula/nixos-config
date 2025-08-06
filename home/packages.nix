@@ -76,7 +76,6 @@
     vesktop
     tmux
     obsidian
-    obs-studio
     dnsmasq
     ani-cli
     telegram-desktop
@@ -91,6 +90,10 @@
 
     jetbrains.idea-community-bin
     element-desktop
+  
+    gh
+    rmpc
+    lrcget
   ];
 
 }

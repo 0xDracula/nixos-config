@@ -132,6 +132,12 @@ in
     enable = true;
     userName = "0xDracula";
     userEmail = "abdallah.ebrahim.official@gmail.com";
+    
+    extraConfig = {
+      init.defaultBranch = "main";
+    };
+
+    package = pkgs.gitFull;
   };
   programs.spicetify =
   let
@@ -144,8 +150,8 @@ in
       adblock
       hidePodcasts
       shuffle # shuffle+ (special characters are sanitized out of extension names)
-      beautifulLyrics
       oneko
+      copyLyrics
     ];
     enabledSnippets = with spicePkgs.snippets; [
       rotatingCoverart
@@ -198,6 +204,37 @@ in
       background_blur = 10;
     };
   };
+
+  services.mpd = {
+    enable = true;
+    musicDirectory = "/home/dracula/Music";
+    extraConfig = ''
+      audio_output {
+        type "pipewire"
+        name "My PipeWire Output"
+      }
+    '';
+  };
+
+  programs.obs-studio = {
+    enable = true;
+
+    package = (
+      pkgs.obs-studio.override {
+        cudaSupport = true;
+      }
+    );
+
+    plugins = with pkgs.obs-studio-plugins; [
+      wlrobs
+      obs-backgroundremoval
+      obs-pipewire-audio-capture
+      obs-vaapi #optional AMD hardware acceleration
+      obs-gstreamer
+      obs-vkcapture
+    ];
+  };
+
   programs.ranger.enable = true;
   programs.chromium.enable = true;
   systemd.user.startServices = "sd-switch";

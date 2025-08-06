@@ -8,8 +8,13 @@
   pkgs,
   stylix,
   ...
-}: {
-  # You can import other NixOS modules here
+}: let 
+ 
+   sddm-theme = inputs.silentSDDM.packages.${pkgs.system}.default.override {
+      theme = "rei"; # select the config of your choice
+   };
+
+ in {
   imports = [
     # If you want to use modules your own flake exports (from modules/nixos):
     # outputs.nixosModules.example
@@ -93,12 +98,29 @@
 
   services.xserver.enable = true;
   
-  services.displayManager.sddm.enable = true;
-  #services.displayManager.gdm.wayland = true;
-  #services.desktopManager.gnome.enable = true;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+    theme = sddm-theme.pname;
+    extraPackages = sddm-theme.propagatedBuildInputs;
+    settings = {
+      General = { 
+        GreeterEnvironment = "QML2_IMPORT_PATH=${sddm-theme}/share/sddm/themes/${sddm-theme.pname}/components/,QT_IM_MODULE=qtvirtualkeyboard";
+        InputMethod = "qtvirtualkeyboard";
+      };
+    };
+  };
+
+  systemd.tmpfiles.rules = let
+    user = "dracula";
+    iconPath = ./avatar.jpg;
+  in [
+    "f+ /var/lib/AccountsService/users/${user}  0600 root root -  [User]\\nIcon=/var/lib/AccountsService/icons/${user}\\n"
+    "L+ /var/lib/AccountsService/icons/${user}  -    -    -    -  ${iconPath}"
+  ];
+
   services.desktopManager.plasma6.enable = true;
-  services.displayManager.sddm.wayland.enable = true; 
-  
+
   # stylix.enable = true;
   # stylix.image = ./modules/stylix/wallpaper.jpg;
   # stylix.cursor = {
@@ -161,10 +183,19 @@
     protonvpn-gui
     ffmpeg-full
     hunspell
+    hunspellDicts.en_US
     #xdg-desktop-portal-gnome
     flameshot
     quickemu
+    anydesk
+    gamemode
+    bootdev-cli
+    sddm-theme
+    sddm-theme.test
   ];
+
+  qt.enable = true;
+
   services.playerctld.enable = true; 
   services.cloudflare-warp.enable = true;  
   systemd.user.services.warp-taskbar = {
