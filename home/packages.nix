@@ -1,7 +1,13 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 
 {
- home.packages = with pkgs; [
+  home.packages = with pkgs; [
     # here is some command line tools I use frequently
     # feel free to add your own or remove some of them
 
@@ -23,12 +29,12 @@
     # networking tools
     mtr # A network diagnostic tool
     iperf3
-    dnsutils  # `dig` + `nslookup`
+    dnsutils # `dig` + `nslookup`
     ldns # replacement of `dig`, it provide the command `drill`
     aria2 # A lightweight multi-protocol & multi-source command-line download utility
     socat # replacement of openbsd-netcat
     nmap # A utility for network discovery and security auditing
-    ipcalc  # it is a calculator for the IPv4/v6 addresses
+    ipcalc # it is a calculator for the IPv4/v6 addresses
 
     # misc
     cowsay
@@ -53,7 +59,7 @@
     hugo # static site generator
     glow # markdown previewer in terminal
 
-    btop  # replacement of htop/nmon
+    btop # replacement of htop/nmon
     iotop # io monitoring
     iftop # network monitoring
 
@@ -70,7 +76,7 @@
     usbutils # lsusb
 
     # custom apps
-    
+
     vlc
     libreoffice-qt6
     vesktop
@@ -80,20 +86,36 @@
     ani-cli
     telegram-desktop
     altus
-    
+
     linux-wifi-hotspot
     jupyter-all
     qbittorrent-enhanced
-  
+
     anki-bin
     fastfetch
 
     jetbrains.idea-community-bin
     element-desktop
-  
+
     gh
     rmpc
     lrcget
-  ];
 
+    wl-clipboard
+
+    nixfmt-rfc-style
+    (inputs.nvix.packages.${pkgs.system}.full.extend {
+        colorschemes.kanagawa-paper.enable = true;
+        colorscheme = "kanagawa-paper";
+    })
+    lazygit
+    gcc
+    stylua
+    fd
+    quickgui
+    pinta
+
+    ghidra
+    cutter
+  ];
 }

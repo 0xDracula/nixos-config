@@ -8,8 +8,8 @@
   pkgs,
   stylix,
   ...
-}: let 
- 
+}: let
+
    sddm-theme = inputs.silentSDDM.packages.${pkgs.system}.default.override {
       theme = "rei"; # select the config of your choice
    };
@@ -26,7 +26,7 @@
     # You can also split up your configuration and import pieces of it here:
     # ./users.nix
 
-    # Import your generated (nixos-generate-config) hardware configuration   
+    # Import your generated (nixos-generate-config) hardware configuration
     ./modules
     ./hardware-configuration.nix
   ];
@@ -79,13 +79,13 @@
       dates = "weekly";
       options = "--delete-older-than 7d";
     };
-  
+
   };
 
   boot.kernelParams = ["resume_offset=77438976"];
   boot.resumeDevice = "/dev/disk/by-label/root";
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  swapDevices = [ 
+  swapDevices = [
    {
      device ="/var/lib/swapfile";
      size = 16 * 1024;
@@ -95,16 +95,16 @@
   networking.hostName = "nixos";
 
   networking.networkmanager.enable = true;
-
+  #services.displayManager.sddm.enable = true;
   services.xserver.enable = true;
-  
+
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
     theme = sddm-theme.pname;
     extraPackages = sddm-theme.propagatedBuildInputs;
     settings = {
-      General = { 
+      General = {
         GreeterEnvironment = "QML2_IMPORT_PATH=${sddm-theme}/share/sddm/themes/${sddm-theme.pname}/components/,QT_IM_MODULE=qtvirtualkeyboard";
         InputMethod = "qtvirtualkeyboard";
       };
@@ -146,7 +146,7 @@
   #     terminal = 12;
   #   };
   # };
-  
+
   services.flatpak.enable = true;
   users.users = {
     dracula = {
@@ -160,7 +160,7 @@
   services.xserver.xkb = {
     layout = "us";
   };
-  
+
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
     drkonqi
   ];
@@ -196,8 +196,8 @@
 
   qt.enable = true;
 
-  services.playerctld.enable = true; 
-  services.cloudflare-warp.enable = true;  
+  services.playerctld.enable = true;
+  services.cloudflare-warp.enable = true;
   systemd.user.services.warp-taskbar = {
     enable = false;
     wantedBy = lib.mkForce [ ]; # forcibly clears wantedBy

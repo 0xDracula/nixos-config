@@ -5,18 +5,16 @@
   config,
   pkgs,
   ...
-}: 
+}:
 let
-  spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.system};
   flameshot-gui = pkgs.writeShellScriptBin "flameshot-gui" "${pkgs.flameshot}/bin/flameshot gui";
 in
 {
   imports = [
     ./packages.nix
     ./plasma.nix
-    inputs.spicetify-nix.homeManagerModules.default 
+    inputs.spicetify-nix.homeManagerModules.default
     inputs.zen-browser.homeModules.twilight
-    inputs.nvf.homeManagerModules.default
   ];
 
   nixpkgs = {
@@ -35,45 +33,7 @@ in
     homeDirectory = "/home/dracula";
   };
 
-  dconf = {
-    enable = true;
-    settings."org/gnome/shell" = {
-      disable-user-extensions = false;
-      enabled-extensions = with pkgs.gnomeExtensions; [
-        appindicator.extensionUuid
-      ];
-    };
-    settings."org/gnome/desktop/peripherals/touchpad" = {
-      two-finger-scrolling-enabled = true;
-    };
-    settings."org/gnome/shell/keybindings" = {
-      show-screenshot-ui = [ ];
-    };
 
-    settings."org/gnome/settings-daemon/plugins/media-keys" = {
-      custom-keybindings = [ 
-        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
-        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
-        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/"
-      ];
-    };
-    settings."org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-      binding = "<Super><Shift>s";
-      command = "${flameshot-gui}/bin/flameshot-gui";
-      name = "Flameshot";
-    };
-    settings."org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
-      binding = "<Super>q";
-      command = "kitty";
-      name = "Kitty";
-    };
-    settings."org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2" = {
-      binding = "<Super>,";
-      command = "smile";
-      name = "Smile";
-    };
-  };
-  
   programs.starship = {
     enable = true;
     # custom settings
@@ -95,15 +55,15 @@ in
         offset.y = 5;
       };
       window.padding = {
-       x = 20;
-       y = 20;
+        x = 20;
+        y = 20;
       };
       window.dynamic_padding = true;
       scrolling.multiplier = 5;
       selection.save_to_clipboard = true;
     };
   };
-  
+
   programs.java = {
     enable = true;
     package = pkgs.jdk.override { enableJavaFX = true; };
@@ -126,13 +86,15 @@ in
   stylix.targets.spicetify.enable = false;
   stylix.targets.vscode.enable = false;
   stylix.targets.zen-browser.profileNames = [ "dracula" ];
-  
+  stylix.targets.nixvim.enable = false;
+  #stylix.targets.nixvim.transparentBackground.numberLine = true;
+  #stylix.targets.kitty.enable = false;
   programs.vscode.enable = true;
   programs.git = {
     enable = true;
     userName = "0xDracula";
     userEmail = "abdallah.ebrahim.official@gmail.com";
-    
+
     extraConfig = {
       init.defaultBranch = "main";
     };
@@ -140,69 +102,54 @@ in
     package = pkgs.gitFull;
   };
   programs.spicetify =
-  let
-    spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
-  in
-  {
-    enable = true;
+    let
+      spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
+    in
+    {
+      enable = true;
 
-    enabledExtensions = with spicePkgs.extensions; [
-      adblock
-      hidePodcasts
-      shuffle # shuffle+ (special characters are sanitized out of extension names)
-      oneko
-      copyLyrics
-    ];
-    enabledSnippets = with spicePkgs.snippets; [
-      rotatingCoverart
-      pointer
-    ];
-    theme = spicePkgs.themes.text;
-  };
-  
-  programs.nvf = {
-    enable = true;
-    
-    # Your settings need to go into the settings attribute set
-    # most settings are documented in the appendix
-    defaultEditor = true;
-    settings = {
-      vim.viAlias = false;
-      vim.vimAlias = true;
-      vim.lsp = {
-        enable = true;
-      };
+      enabledExtensions = with spicePkgs.extensions; [
+        adblock
+        hidePodcasts
+        shuffle # shuffle+ (special characters are sanitized out of extension names)
+        oneko
+        copyLyrics
+      ];
+      enabledSnippets = with spicePkgs.snippets; [
+        rotatingCoverart
+        pointer
+      ];
+      theme = spicePkgs.themes.text;
     };
-  };
 
   programs.zen-browser = {
     enable = true;
     policies = {
-       DisableAppUpdate = true;
-       DisableTelemetry = true;
-       OfferToSaveLogins = true;
-       OfferToSaveLoginsDefault = false;
-       # find more options here: https://mozilla.github.io/policy-templates/
-     };
+      DisableAppUpdate = true;
+      DisableTelemetry = true;
+      OfferToSaveLogins = true;
+      OfferToSaveLoginsDefault = false;
+      # find more options here: https://mozilla.github.io/policy-templates/
+    };
 
   };
-  
+
   programs.fish = {
     enable = true;
     shellInit = ''
-        set fish_greeting ""
-        fastfetch
+      set fish_greeting ""
+      fastfetch
     '';
 
   };
 
   programs.kitty = {
     enable = true;
-    settings = {
-      window_padding_width = 15;
-      # hide_window_decorations = true;
-      background_blur = 10;
-    };
+    #settings = {
+    #window_padding_width = 15;
+    # hide_window_decorations = true;
+    #background_blur = 10;
+    #};
   };
 
   services.mpd = {
@@ -229,15 +176,60 @@ in
       wlrobs
       obs-backgroundremoval
       obs-pipewire-audio-capture
-      obs-vaapi #optional AMD hardware acceleration
+      obs-vaapi # optional AMD hardware acceleration
       obs-gstreamer
       obs-vkcapture
     ];
   };
 
+  # programs.nixvim = {
+  #   enable = true;
+  #   defaultEditor = true;
+
+  #   extraConfigLua = ''
+  #           vim.opt.number = true
+  #     	    vim.opt.relativenumber = true
+  #     	    vim.opt.wrap = false
+  #           vim.opt.expandtab = true
+  #     	    vim.opt.tabstop = 2
+  #           vim.opt.shiftwidth = 2
+  #     	    vim.opt.clipboard = "unnamedplus"
+  #     	    vim.opt.scrolloff = 999
+  #           vim.opt.virtualedit = "block"
+  #           vim.opt.inccommand = "split"
+  #           vim.opt.splitright = true
+  #           vim.opt.ignorecase = true
+  #   '';
+
+  #   plugins.treesitter = {
+  #     enable = true;
+  #     settings.highlight.enable = true;
+  #   };
+
+  #   plugins = {
+  #     lsp-format.enable = true;
+  #     lsp = {
+  #       enable = true;
+  #       inlayHints = true;
+
+  #       servers = {
+  #         nixd = {
+  #           enable = true;
+  #           settings = {
+  #             formatting.command = [ "${lib.getExe pkgs.nixfmt-rfc-style}" ];
+  #           };
+  #         };
+  #       };
+  #     };
+  #   };
+  #   nixpkgs.useGlobalPackages = true;
+
+  #   viAlias = true;
+  #   vimAlias = true;
+  # };
   programs.ranger.enable = true;
   programs.chromium.enable = true;
   systemd.user.startServices = "sd-switch";
-  
+
   home.stateVersion = "25.05";
 }
