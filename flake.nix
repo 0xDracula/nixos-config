@@ -21,7 +21,9 @@
     };
 
     silentSDDM = {
-      url = "github:uiriansan/SilentSDDM";
+      #url = "github:uiriansan/SilentSDDM/6e4507e780995320f36ebbf414df218583e87380";
+      #url = "github:uiriansan/SilentSDDM";
+      url = "/home/dracula/SilentSDDM";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {

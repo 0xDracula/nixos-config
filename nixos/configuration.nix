@@ -29,6 +29,7 @@
     # Import your generated (nixos-generate-config) hardware configuration
     ./modules
     ./hardware-configuration.nix
+    inputs.silentSDDM.nixosModules.sddm-cache-clear
   ];
 
   nixpkgs = {
@@ -110,7 +111,6 @@
       };
     };
   };
-
   systemd.tmpfiles.rules = let
     user = "dracula";
     iconPath = ./avatar.jpg;
