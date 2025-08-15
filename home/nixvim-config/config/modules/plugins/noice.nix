@@ -1,5 +1,0 @@
-{
-  plugins.noice = {
-    enable = true;
-  };
-}

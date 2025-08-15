@@ -16,14 +16,13 @@
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
 
     nvix = {
-      url = "github:niksingh710/nvix";
+      url = "/home/dracula/nixos/home/nvix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    silentSDDM = {
+    SilentSDDM = {
       #url = "github:uiriansan/SilentSDDM/6e4507e780995320f36ebbf414df218583e87380";
-      #url = "github:uiriansan/SilentSDDM";
-      url = "/home/dracula/SilentSDDM";
+      url = "github:uiriansan/SilentSDDM";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {

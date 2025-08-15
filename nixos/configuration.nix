@@ -10,8 +10,8 @@
   ...
 }: let
 
-   sddm-theme = inputs.silentSDDM.packages.${pkgs.system}.default.override {
-      theme = "rei"; # select the config of your choice
+   sddm-theme = inputs.SilentSDDM.packages.${pkgs.system}.default.override {
+    theme = "rei";
    };
 
  in {
@@ -29,7 +29,6 @@
     # Import your generated (nixos-generate-config) hardware configuration
     ./modules
     ./hardware-configuration.nix
-    inputs.silentSDDM.nixosModules.sddm-cache-clear
   ];
 
   nixpkgs = {
@@ -105,12 +104,14 @@
     theme = sddm-theme.pname;
     extraPackages = sddm-theme.propagatedBuildInputs;
     settings = {
-      General = {
-        GreeterEnvironment = "QML2_IMPORT_PATH=${sddm-theme}/share/sddm/themes/${sddm-theme.pname}/components/,QT_IM_MODULE=qtvirtualkeyboard";
-        InputMethod = "qtvirtualkeyboard";
+        # required for styling the virtual keyboard
+        General = {
+          GreeterEnvironment = "QML2_IMPORT_PATH=${sddm-theme}/share/sddm/themes/${sddm-theme.pname}/components/,QT_IM_MODULE=qtvirtualkeyboard";
+          InputMethod = "qtvirtualkeyboard";
+        };
       };
-    };
   };
+
   systemd.tmpfiles.rules = let
     user = "dracula";
     iconPath = ./avatar.jpg;
