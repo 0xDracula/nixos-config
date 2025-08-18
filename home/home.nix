@@ -107,13 +107,14 @@ in
     in
     {
       enable = true;
-
+      alwaysEnableDevTools = true;
       enabledExtensions = with spicePkgs.extensions; [
         adblock
         hidePodcasts
         shuffle # shuffle+ (special characters are sanitized out of extension names)
         oneko
         copyLyrics
+        beautifulLyrics
       ];
       enabledSnippets = with spicePkgs.snippets; [
         rotatingCoverart

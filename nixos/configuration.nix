@@ -111,7 +111,6 @@
         };
       };
   };
-
   systemd.tmpfiles.rules = let
     user = "dracula";
     iconPath = ./avatar.jpg;
