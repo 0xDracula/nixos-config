@@ -39,6 +39,13 @@
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     prismlauncher.url = "github:0xDracula/PrismLauncher";
+    viu.url = "github:Benexl/viu";
+    yt-x = {
+      url = "github:Benexl/yt-x";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-ai.url = "github:olafkfreund/nix-ai-help";
+    airi.url = "github:moeru-ai/airi";
   };
   outputs =
     {

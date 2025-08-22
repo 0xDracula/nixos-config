@@ -108,6 +108,8 @@
         colorschemes.kanagawa-paper.enable = true;
         colorscheme = "kanagawa-paper";
     })
+    inputs.viu.packages.${pkgs.system}.default
+    inputs.yt-x.packages."${system}".default
     lazygit
     gcc
     stylua
@@ -117,5 +119,16 @@
 
     ghidra
     cutter
+
+    comma
+    firefox
+
+    inputs.nix-ai.packages.${pkgs.system}.default
+
+    (ollama.override {
+      acceleration = "cuda";
+     })
+
+    inputs.airi.packages.${pkgs.system}.default
   ];
 }

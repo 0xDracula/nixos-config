@@ -120,7 +120,7 @@
   ];
 
   services.desktopManager.plasma6.enable = true;
-
+  services.open-webui.enable = true;
   # stylix.enable = true;
   # stylix.image = ./modules/stylix/wallpaper.jpg;
   # stylix.cursor = {
