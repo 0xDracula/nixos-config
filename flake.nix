@@ -19,7 +19,7 @@
       url = "/home/dracula/nixos/home/nvix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    nix-gaming.url = "github:fufexan/nix-gaming";
     SilentSDDM = {
       #url = "github:uiriansan/SilentSDDM/6e4507e780995320f36ebbf414df218583e87380";
       url = "github:uiriansan/SilentSDDM";
@@ -31,7 +31,7 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
-
+    matugen.url = "github:/InioX/Matugen";
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -45,7 +45,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-ai.url = "github:olafkfreund/nix-ai-help";
-    airi.url = "github:moeru-ai/airi";
+    winapps = {
+      url = "github:winapps-org/winapps";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    WinBoat = {
+      url = "github:TibixDev/winboat";
+    };
   };
   outputs =
     {
@@ -56,6 +62,7 @@
       nixos-hardware,
       plasma-manager,
       prismlauncher,
+      winapps,
       ...
     }@inputs:
     let
@@ -91,7 +98,11 @@
             (
               { pkgs, ... }:
               {
-                environment.systemPackages = [ prismlauncher.packages.${pkgs.system}.prismlauncher ];
+                environment.systemPackages = [
+                  prismlauncher.packages.${pkgs.system}.prismlauncher
+                  winapps.packages."${pkgs.system}".winapps
+                  winapps.packages."${pkgs.system}".winapps-launcher # optional
+                ];
               }
             )
             stylix.nixosModules.stylix

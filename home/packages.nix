@@ -129,6 +129,22 @@
       acceleration = "cuda";
      })
 
-    inputs.airi.packages.${pkgs.system}.default
+    gimp3-with-plugins
+
+    devenv
+    tor-browser
+
+    inputs.nix-gaming.packages.${pkgs.system}.osu-lazer-bin
+    inputs.nix-gaming.packages.${pkgs.system}.osu-stable
+
+    code-cursor
+
+    eza
+
+    helix
+
+    gajim
+
+    betterdiscordctl
   ];
 }

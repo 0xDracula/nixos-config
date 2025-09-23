@@ -118,7 +118,15 @@
     "f+ /var/lib/AccountsService/users/${user}  0600 root root -  [User]\\nIcon=/var/lib/AccountsService/icons/${user}\\n"
     "L+ /var/lib/AccountsService/icons/${user}  -    -    -    -  ${iconPath}"
   ];
+  virtualisation.docker = {
+    enable = true;
+  };
 
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+    xwayland.enable = true; # Xwayland can be disabled.
+  };
   services.desktopManager.plasma6.enable = true;
   services.open-webui.enable = true;
   # stylix.enable = true;
@@ -151,7 +159,7 @@
   users.users = {
     dracula = {
       isNormalUser = true;
-      extraGroups = ["input" "wheel" "networkmanager" "gamemode"];
+      extraGroups = ["input" "wheel" "networkmanager" "gamemode" "docker"];
     };
   };
 
@@ -192,10 +200,43 @@
     bootdev-cli
     sddm-theme
     sddm-theme.test
+    inputs.matugen.packages.${system}.default
+    libnotify
+    dialog
+    freerdp3
+    iproute2
+    netcat-openbsd
+    virt-manager
+    virt-viewer
+    spice
+    spice-gtk
+    spice-protocol
+    win-virtio
+    win-spice
+    inputs.WinBoat.packages.${system}.default
   ];
-
+  virtualisation = {
+    libvirtd = {
+      enable = true;
+      qemu = {
+        swtpm.enable = true;
+        ovmf.enable = true;
+        ovmf.packages = [ pkgs.OVMFFull.fd ];
+      };
+    };
+    spiceUSBRedirection.enable = true;
+  };
+  services.spice-vdagentd.enable = true;
   qt.enable = true;
 
+  services.tor = {
+    enable = true;
+    client.enable = true;
+    client.dns.enable = true;
+    torsocks.enable = true;
+  };
+
+  virtualisation.waydroid.enable = true;
   services.playerctld.enable = true;
   services.cloudflare-warp.enable = true;
   systemd.user.services.warp-taskbar = {
@@ -207,6 +248,9 @@
   };
   programs.steam.enable = true;
   programs.gamescope.enable = true;
-
+  networking.firewall = rec {
+    allowedTCPPortRanges = [ { from = 1714; to = 1764; } ];
+    allowedUDPPortRanges = allowedTCPPortRanges;
+  };
   system.stateVersion = "25.05";
 }

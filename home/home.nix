@@ -183,6 +183,8 @@ in
     ];
   };
 
+  services.kdeconnect.enable = true;
+
   # programs.nixvim = {
   #   enable = true;
   #   defaultEditor = true;
