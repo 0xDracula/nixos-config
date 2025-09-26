@@ -20,17 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-gaming.url = "github:fufexan/nix-gaming";
-    SilentSDDM = {
-      #url = "github:uiriansan/SilentSDDM/6e4507e780995320f36ebbf414df218583e87380";
-      url = "github:uiriansan/SilentSDDM";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    stylix = {
-      url = "github:danth/stylix";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
     matugen.url = "github:/InioX/Matugen";
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
@@ -39,18 +28,13 @@
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     prismlauncher.url = "github:0xDracula/PrismLauncher";
-    viu.url = "github:Benexl/viu";
-    yt-x = {
-      url = "github:Benexl/yt-x";
+    dgop = {
+      url = "github:AvengeMedia/dgop";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-ai.url = "github:olafkfreund/nix-ai-help";
-    winapps = {
-      url = "github:winapps-org/winapps";
+    dms-cli = {
+      url = "github:AvengeMedia/danklinux";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    WinBoat = {
-      url = "github:TibixDev/winboat";
     };
   };
   outputs =
@@ -58,11 +42,9 @@
       self,
       nixpkgs,
       home-manager,
-      stylix,
       nixos-hardware,
       plasma-manager,
       prismlauncher,
-      winapps,
       ...
     }@inputs:
     let
@@ -100,12 +82,9 @@
               {
                 environment.systemPackages = [
                   prismlauncher.packages.${pkgs.system}.prismlauncher
-                  winapps.packages."${pkgs.system}".winapps
-                  winapps.packages."${pkgs.system}".winapps-launcher # optional
                 ];
               }
             )
-            stylix.nixosModules.stylix
             ./nixos/configuration.nix
             nixos-hardware.nixosModules.common-cpu-intel
             nixos-hardware.nixosModules.common-gpu-nvidia

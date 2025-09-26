@@ -6,13 +6,9 @@
   lib,
   config,
   pkgs,
-  stylix,
   ...
 }: let
 
-   sddm-theme = inputs.SilentSDDM.packages.${pkgs.system}.default.override {
-    theme = "rei";
-   };
 
  in {
   imports = [
@@ -30,7 +26,26 @@
     ./modules
     ./hardware-configuration.nix
   ];
-
+  qt = {
+    platformTheme = "gnome";
+    style = "adwaita-dark";
+  };
+  xdg.portal = {
+    enable = true;
+    xdgOpenUsePortal = true;
+    config = {
+      common = {
+        default = ["gnome" "gtk"];
+        "org.freedesktop.impl.portal.ScreenCast" = "gnome";
+        "org.freedesktop.impl.portal.Screenshot" = "gnome";
+        "org.freedesktop.impl.portal.RemoteDesktop" = "gnome";
+      };
+    };
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-gnome
+    ];
+  };
   nixpkgs = {
     # You can add overlays here
     overlays = [
@@ -63,6 +78,7 @@
       # Enable flakes and new 'nix' command
       experimental-features = "nix-command flakes";
       # Opinionated: disable global registry
+      trusted-users = [ "root" "dracula" ];
       flake-registry = "";
       # Workaround for https://github.com/NixOS/nix/issues/9574
       nix-path = config.nix.nixPath;
@@ -93,24 +109,11 @@
   ];
 
   networking.hostName = "nixos";
-
+  #services.xserver.displayManager.gdm.enable = true;
   networking.networkmanager.enable = true;
-  #services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = true;
   services.xserver.enable = true;
 
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = true;
-    theme = sddm-theme.pname;
-    extraPackages = sddm-theme.propagatedBuildInputs;
-    settings = {
-        # required for styling the virtual keyboard
-        General = {
-          GreeterEnvironment = "QML2_IMPORT_PATH=${sddm-theme}/share/sddm/themes/${sddm-theme.pname}/components/,QT_IM_MODULE=qtvirtualkeyboard";
-          InputMethod = "qtvirtualkeyboard";
-        };
-      };
-  };
   systemd.tmpfiles.rules = let
     user = "dracula";
     iconPath = ./avatar.jpg;
@@ -122,39 +125,7 @@
     enable = true;
   };
 
-  programs.hyprland = {
-    enable = true;
-    withUWSM = true;
-    xwayland.enable = true; # Xwayland can be disabled.
-  };
-  services.desktopManager.plasma6.enable = true;
   services.open-webui.enable = true;
-  # stylix.enable = true;
-  # stylix.image = ./modules/stylix/wallpaper.jpg;
-  # stylix.cursor = {
-  #   package = pkgs.bibata-cursors;
-  #   name = "Bibata-Modern-Ice";
-  #   size = 24;
-  # };
-  # stylix.opacity = {
-  #   terminal = 0.95;
-  #   popups = 95;
-  # };
-  # stylix.polarity = "dark";
-  # stylix.fonts = {
-  #   emoji = {
-  #     package = pkgs.noto-fonts-color-emoji;
-  #     name = "Noto Color Emoji";
-  #   };
-
-  #   sizes = {
-  #     applications = 12;
-  #     desktop = 12;
-  #     popups = 12;
-  #     terminal = 12;
-  #   };
-  # };
-
   services.flatpak.enable = true;
   users.users = {
     dracula = {
@@ -164,15 +135,11 @@
   };
 
   services.printing.enable = true;
-  xdg.portal.enable = true;
   services.xserver.xkb = {
     layout = "us";
   };
-
-  environment.plasma6.excludePackages = with pkgs.kdePackages; [
-    drkonqi
-  ];
-
+  security.polkit.enable = true;
+  programs.niri.enable = true;
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
@@ -198,8 +165,6 @@
     anydesk
     gamemode
     bootdev-cli
-    sddm-theme
-    sddm-theme.test
     inputs.matugen.packages.${system}.default
     libnotify
     dialog
@@ -213,8 +178,32 @@
     spice-protocol
     win-virtio
     win-spice
-    inputs.WinBoat.packages.${system}.default
+    cachix
+    brightnessctl
+    quickshell
+    material-icons
+    material-symbols
+    inter
+    fira-code
+
+    ddcutil
+    libsForQt5.qt5ct
+    kdePackages.qt6ct
+    inputs.dms-cli.packages.${pkgs.system}.default
+    inputs.dgop.packages.${pkgs.system}.dgop
+    cava
+    khal
+    gammastep
+    nautilus
+    cabextract
+    emacs
+    glib
+    gnome-themes-extra
+    cliphist
+    papirus-icon-theme
   ];
+  services.power-profiles-daemon.enable = true;
+  services.upower.enable = true;
   virtualisation = {
     libvirtd = {
       enable = true;
@@ -235,7 +224,7 @@
     client.dns.enable = true;
     torsocks.enable = true;
   };
-
+  programs.dconf.enable = true;
   virtualisation.waydroid.enable = true;
   services.playerctld.enable = true;
   services.cloudflare-warp.enable = true;

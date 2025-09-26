@@ -8,14 +8,37 @@
 }:
 let
   flameshot-gui = pkgs.writeShellScriptBin "flameshot-gui" "${pkgs.flameshot}/bin/flameshot gui";
+  dir = "/home/dracula/nixos/home";
 in
 {
   imports = [
     ./packages.nix
     ./plasma.nix
+    ./niri
+    ./matugen
     inputs.spicetify-nix.homeManagerModules.default
     inputs.zen-browser.homeModules.twilight
   ];
+  xdg.configFile = {
+    quickshell.source = config.lib.file.mkOutOfStoreSymlink "${dir}/quickshell";
+  };
+  systemd.user.services.noctalia-shell = {
+    Unit = {
+      Description = "Noctalia Shell Service";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+
+    Service = {
+      ExecStart = "${pkgs.quickshell}/bin/qs -c noctalia";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
+  };
 
   nixpkgs = {
     overlays = [
@@ -30,6 +53,9 @@ in
 
   home = {
     username = "dracula";
+    sessionVariables = {
+      QS_ICON_THEME = "Papirus";
+    };
     homeDirectory = "/home/dracula";
   };
 
@@ -83,12 +109,32 @@ in
       fi
     '';
   };
-  stylix.targets.spicetify.enable = false;
-  stylix.targets.vscode.enable = false;
-  stylix.targets.zen-browser.profileNames = [ "dracula" ];
-  stylix.targets.nixvim.enable = false;
-  #stylix.targets.nixvim.transparentBackground.numberLine = true;
-  #stylix.targets.kitty.enable = false;
+
+  dconf.settings = {
+      "org/gnome/desktop/background" = {
+        picture-uri-dark = "file://${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.src}";
+      };
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+      };
+    };
+
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Adwaita-dark";
+      package = pkgs.gnome-themes-extra;
+    };
+  };
+
+    # Wayland, X, etc. support for session vars
+
+  programs.fuzzel.enable = true;
+  programs.fuzzel.settings = {
+    main = {
+      include = "~/.config/fuzzel/colors.ini";
+    };
+  };
   programs.vscode.enable = true;
   programs.git = {
     enable = true;
@@ -146,6 +192,11 @@ in
 
   programs.kitty = {
     enable = true;
+    extraConfig = ''
+      include colors.conf
+      hide_window_decorations yes
+      window_padding_width 15
+    '';
     #settings = {
     #window_padding_width = 15;
     # hide_window_decorations = true;

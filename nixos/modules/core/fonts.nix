@@ -14,6 +14,8 @@
      dina-font
      proggyfonts
      rubik
+     dejavu_fonts
+     adwaita-fonts
    ];
   };
 }

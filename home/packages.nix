@@ -108,8 +108,6 @@
         colorschemes.kanagawa-paper.enable = true;
         colorscheme = "kanagawa-paper";
     })
-    inputs.viu.packages.${pkgs.system}.default
-    inputs.yt-x.packages."${system}".default
     lazygit
     gcc
     stylua
@@ -122,8 +120,6 @@
 
     comma
     firefox
-
-    inputs.nix-ai.packages.${pkgs.system}.default
 
     (ollama.override {
       acceleration = "cuda";
@@ -146,5 +142,13 @@
     gajim
 
     betterdiscordctl
+    swww
+
+    gpu-screen-recorder
+
+    wine
+    winetricks
+
+    todoist-electron
   ];
 }
