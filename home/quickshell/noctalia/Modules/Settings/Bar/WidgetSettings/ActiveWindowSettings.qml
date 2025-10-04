@@ -23,26 +23,28 @@ ColumnLayout {
     settings.autoHide = valueAutoHide
     settings.showIcon = valueShowIcon
     settings.scrollingMode = valueScrollingMode
-    console.log(JSON.stringify(settings))
     return settings
   }
 
   NToggle {
     Layout.fillWidth: true
-    label: I18n.tr("bar.widget-settings.active-window.auto-hide")
+    label: I18n.tr("bar.widget-settings.active-window.auto-hide.label")
+    description: I18n.tr("bar.widget-settings.active-window.auto-hide.description")
     checked: root.valueAutoHide
     onToggled: checked => root.valueAutoHide = checked
   }
 
   NToggle {
     Layout.fillWidth: true
-    label: I18n.tr("bar.widget-settings.active-window.show-app-icon")
+    label: I18n.tr("bar.widget-settings.active-window.show-app-icon.label")
+    description: I18n.tr("bar.widget-settings.active-window.show-app-icon.description")
     checked: root.valueShowIcon
     onToggled: checked => root.valueShowIcon = checked
   }
 
   NComboBox {
-    label: I18n.tr("bar.widget-settings.active-window.scrolling-mode")
+    label: I18n.tr("bar.widget-settings.active-window.scrolling-mode.label")
+    description: I18n.tr("bar.widget-settings.active-window.scrolling-mode.description")
     model: [{
         "key": "always",
         "name": I18n.tr("options.scrolling-modes.always")

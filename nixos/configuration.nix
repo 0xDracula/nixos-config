@@ -196,11 +196,13 @@
     gammastep
     nautilus
     cabextract
-    emacs
+    emacs-gtk
     glib
     gnome-themes-extra
     cliphist
     papirus-icon-theme
+    kdePackages.polkit-kde-agent-1
+    niriswitcher
   ];
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;

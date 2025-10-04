@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import qs.Commons
+import qs.Services
 
 Rectangle {
   id: root
@@ -77,9 +78,8 @@ Rectangle {
     NIcon {
       Layout.alignment: Qt.AlignVCenter
       visible: root.icon !== ""
-
       icon: root.icon
-      font.pointSize: root.iconSize
+      pointSize: root.iconSize
       color: {
         if (!root.enabled)
           return Color.mOnSurfaceVariant
@@ -104,7 +104,7 @@ Rectangle {
       Layout.alignment: Qt.AlignVCenter
       visible: root.text !== ""
       text: root.text
-      font.pointSize: root.fontSize
+      pointSize: root.fontSize
       font.weight: root.fontWeight
       color: {
         if (!root.enabled)
@@ -126,13 +126,6 @@ Rectangle {
     }
   }
 
-  NTooltip {
-    id: tooltip
-    target: root
-    positionAbove: Settings.data.bar.position === "bottom"
-    text: root.tooltipText
-  }
-
   // Mouse interaction
   MouseArea {
     id: mouseArea
@@ -145,18 +138,18 @@ Rectangle {
     onEntered: {
       root.hovered = true
       if (tooltipText) {
-        tooltip.show()
+        TooltipService.show(root, root.tooltipText)
       }
     }
     onExited: {
       root.hovered = false
       if (tooltipText) {
-        tooltip.hide()
+        TooltipService.hide()
       }
     }
     onPressed: mouse => {
                  if (tooltipText) {
-                   tooltip.hide()
+                   TooltipService.hide()
                  }
                  if (mouse.button === Qt.LeftButton) {
                    root.clicked()
@@ -170,7 +163,7 @@ Rectangle {
     onCanceled: {
       root.hovered = false
       if (tooltipText) {
-        tooltip.hide()
+        TooltipService.hide()
       }
     }
   }

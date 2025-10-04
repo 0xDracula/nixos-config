@@ -110,6 +110,16 @@
         }:
         let
           cfg = config.programs.noctalia-shell;
+          defaultSettings = builtins.fromJSON (builtins.readFile ./Assets/settings-default.json);
+
+          # Deep merge user settings with defaults
+          mergedSettings =
+            if cfg.settings == null then
+              defaultSettings
+            else if builtins.isAttrs cfg.settings then
+              lib.recursiveUpdate defaultSettings cfg.settings
+            else
+              cfg.settings; # Pass through strings/paths as-is
         in
         {
           options.programs.noctalia-shell = {
@@ -144,6 +154,8 @@
               description = ''
                 Noctalia shell configuration settings as an attribute set, string
                 or filepath, to be written to ~/.config/noctalia/settings.json.
+                When provided as an attribute set, it will be deep-merged with
+                the default settings.
               '';
             };
 
@@ -189,18 +201,16 @@
             in
             lib.mkIf cfg.enable {
               xdg.configFile = {
-                "noctalia/settings.json" = lib.mkIf (cfg.settings != null) (
-                  {
-                    onChange = restart;
-                  }
-                  // (
-                    if builtins.isAttrs cfg.settings then
-                      { text = builtins.toJSON cfg.settings; }
-                    else if builtins.isString cfg.settings then
-                      { text = cfg.settings; }
-                    else
-                      { source = cfg.settings; }
-                  )
+                "noctalia/settings.json" = {
+                  onChange = restart;
+                }
+                // (
+                  if builtins.isAttrs mergedSettings then
+                    { text = builtins.toJSON mergedSettings + "\n"; }
+                  else if builtins.isString mergedSettings then
+                    { text = mergedSettings; }
+                  else
+                    { source = mergedSettings; }
                 );
                 "noctalia/colors.json" = lib.mkIf (cfg.colors != null) (
                   {
@@ -254,6 +264,7 @@
               after = [ cfg.target ];
               partOf = [ cfg.target ];
               wantedBy = [ cfg.target ];
+              restartTriggers = [ cfg.package ];
 
               unitConfig = {
                 StartLimitIntervalSec = 60;
@@ -266,7 +277,10 @@
                 RestartSec = 3;
                 TimeoutStartSec = 10;
                 TimeoutStopSec = 5;
-                Environment = [ "PATH=${config.system.path}/bin" ];
+                Environment = [
+                  "PATH=${config.system.path}/bin"
+                  "NOCTALIA_SETTINGS_FALLBACK=%h/.config/noctalia/gui-settings.json"
+                ];
               };
             };
 

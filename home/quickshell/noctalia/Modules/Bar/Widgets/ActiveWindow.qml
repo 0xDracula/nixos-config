@@ -108,7 +108,7 @@ Item {
     id: fullTitleMetrics
     visible: false
     text: windowTitle
-    font.pointSize: Style.fontSizeS * scaling
+    pointSize: Style.fontSizeS * scaling
     font.weight: Style.fontWeightMedium
   }
 
@@ -239,13 +239,13 @@ Item {
             property real scrollX: 0
             x: scrollX
 
-            Row {
+            RowLayout {
               spacing: 50 * scaling // Gap between text copies
 
               NText {
                 id: titleText
                 text: windowTitle
-                font.pointSize: Style.fontSizeS * scaling
+                pointSize: Style.fontSizeS * scaling
                 font.weight: Style.fontWeightMedium
                 verticalAlignment: Text.AlignVCenter
                 color: Color.mOnSurface
@@ -328,27 +328,15 @@ Item {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onEntered: {
-          if (barPosition === "left" || barPosition === "right") {
-            tooltip.show()
-          } else if ((tooltip.text !== "") && (scrollingMode === "never")) {
-            tooltip.show()
+          if ((windowTitle !== "") && (barPosition === "left" || barPosition === "right") || (scrollingMode === "never")) {
+            TooltipService.show(root, windowTitle, BarService.getTooltipDirection())
           }
         }
         onExited: {
-          tooltip.hide()
+          TooltipService.hide()
         }
       }
     }
-  }
-
-  NTooltip {
-    id: tooltip
-    text: windowTitle
-    target: (barPosition === "left" || barPosition === "right") ? verticalLayout : windowActiveRect
-    positionLeft: barPosition === "right"
-    positionRight: barPosition === "left"
-    positionAbove: Settings.data.bar.position === "bottom"
-    delay: Style.tooltipDelay
   }
 
   Connections {

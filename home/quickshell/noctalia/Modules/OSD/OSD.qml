@@ -7,7 +7,7 @@ import qs.Commons
 import qs.Services
 import qs.Widgets
 
-// Unified OSD component - handles both volume and brightness with a single instance
+// Unified OSD component
 // Loader activates only when showing OSD, deactivates when hidden to save resources
 Variants {
   model: Quickshell.screens
@@ -22,7 +22,7 @@ Variants {
     property ListModel notificationModel: NotificationService.activeList
 
     // If no notification display activated in settings, then show them all
-    property bool canShowOnThisScreen: Settings.isLoaded && modelData && (Settings.data.notifications.monitors.includes(modelData.name) || (Settings.data.notifications.monitors.length === 0))
+    property bool canShowOnThisScreen: modelData && (Settings.data.osd.monitors.includes(modelData.name) || (Settings.data.osd.monitors.length === 0))
 
     // Loader is only active when actually showing something
     active: false
@@ -71,9 +71,13 @@ Variants {
     // Get display percentage
     function getDisplayPercentage() {
       if (currentOSDType === "volume") {
-        return isMuted ? "0%" : Math.round(currentVolume * 100) + "%"
+        if (isMuted)
+          return "0%"
+        const pct = Math.round(Math.min(1.0, currentVolume) * 100)
+        return pct + "%"
       } else if (currentOSDType === "brightness") {
-        return Math.round(currentBrightness * 100) + "%"
+        const pct = Math.round(Math.min(1.0, currentBrightness) * 100)
+        return pct + "%"
       }
       return ""
     }
@@ -82,8 +86,6 @@ Variants {
     function getProgressColor() {
       if (currentOSDType === "volume") {
         if (isMuted)
-          return Color.mError
-        if (currentVolume > 1.0)
           return Color.mError
         return Color.mPrimary
       }
@@ -99,24 +101,77 @@ Variants {
     }
 
     sourceComponent: PanelWindow {
+      id: panel
       screen: modelData
 
-      anchors {
-        top: true
-      }
+      readonly property string location: (Settings.data.osd && Settings.data.osd.location) ? Settings.data.osd.location : "top_right"
+      readonly property bool isTop: (location === "top") || (location.length >= 3 && location.substring(0, 3) === "top")
+      readonly property bool isBottom: (location === "bottom") || (location.length >= 6 && location.substring(0, 6) === "bottom")
+      readonly property bool isLeft: (location.indexOf("_left") >= 0) || (location === "left")
+      readonly property bool isRight: (location.indexOf("_right") >= 0) || (location === "right")
+      readonly property bool isCentered: (location === "top" || location === "bottom")
+      readonly property bool verticalMode: (location === "left" || location === "right")
+      readonly property int hWidth: Math.round(320 * root.scaling)
+      readonly property int hHeight: Math.round(64 * root.scaling)
+      // Ensure an even width to keep the vertical bar perfectly centered
+      readonly property int barThickness: (function () {
+        const base = Math.max(6, Math.round(6 * root.scaling))
+        return (base % 2 === 0) ? base : base + 1
+      })()
 
-      implicitWidth: 320 * root.scaling
-      implicitHeight: osdItem.height
+      // Anchor selection based on location (window edges)
+      anchors.top: isTop
+      anchors.bottom: isBottom
+      anchors.left: isLeft
+      anchors.right: isRight
 
-      // Set margins based on bar position
+      // Margins depending on bar position and chosen location
       margins.top: {
-        switch (Settings.data.bar.position) {
-        case "top":
-          return (Style.barHeight + Style.marginS) * root.scaling + (Settings.data.bar.floating ? Settings.data.bar.marginVertical * Style.marginXL * root.scaling : 0)
-        default:
-          return Style.marginL * root.scaling
+        if (!(anchors.top))
+          return 0
+        var base = Style.marginM * scaling
+        if (Settings.data.bar.position === "top") {
+          var floatExtraV = Settings.data.bar.floating ? Settings.data.bar.marginVertical * Style.marginXL * scaling : 0
+          return (Style.barHeight * scaling) + base + floatExtraV
         }
+        return base
       }
+
+      margins.bottom: {
+        if (!(anchors.bottom))
+          return 0
+        var base = Style.marginM * scaling
+        if (Settings.data.bar.position === "bottom") {
+          var floatExtraV = Settings.data.bar.floating ? Settings.data.bar.marginVertical * Style.marginXL * scaling : 0
+          return (Style.barHeight * scaling) + base + floatExtraV
+        }
+        return base
+      }
+
+      margins.left: {
+        if (!(anchors.left))
+          return 0
+        var base = Style.marginM * scaling
+        if (Settings.data.bar.position === "left") {
+          var floatExtraH = Settings.data.bar.floating ? Settings.data.bar.marginHorizontal * Style.marginXL * scaling : 0
+          return (Style.barHeight * scaling) + base + floatExtraH
+        }
+        return base
+      }
+
+      margins.right: {
+        if (!(anchors.right))
+          return 0
+        var base = Style.marginM * scaling
+        if (Settings.data.bar.position === "right") {
+          var floatExtraH = Settings.data.bar.floating ? Settings.data.bar.marginHorizontal * Style.marginXL * scaling : 0
+          return (Style.barHeight * scaling) + base + floatExtraH
+        }
+        return base
+      }
+
+      implicitWidth: verticalMode ? hHeight : hWidth
+      implicitHeight: osdItem.height
 
       color: Color.transparent
 
@@ -127,16 +182,20 @@ Variants {
         id: osdItem
 
         width: parent.width
-        height: Math.round(contentLayout.implicitHeight + Style.marginL * 2 * root.scaling)
+        height: panel.verticalMode ? panel.hWidth : Math.round(64 * root.scaling)
         radius: Style.radiusL * root.scaling
         color: Color.mSurface
         border.color: Color.mOutline
-        border.width: Math.max(2, Style.borderM * root.scaling)
+        border.width: (function () {
+          const bw = Math.max(2, Math.round(Style.borderM * root.scaling))
+          return (bw % 2 === 0) ? bw : bw + 1
+        })()
         visible: false
         opacity: 0
         scale: 0.85
 
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: verticalMode ? undefined : parent.horizontalCenter
+        anchors.verticalCenter: verticalMode ? parent.verticalCenter : undefined
 
         Behavior on opacity {
           NumberAnimation {
@@ -156,7 +215,7 @@ Variants {
 
         Timer {
           id: hideTimer
-          interval: 2000
+          interval: Settings.data.osd.autoHideMs
           onTriggered: osdItem.hide()
         }
 
@@ -172,52 +231,30 @@ Variants {
           }
         }
 
-        RowLayout {
-          id: contentLayout
+        Loader {
+          id: contentLoader
           anchors.fill: parent
-          anchors.margins: Style.marginM * root.scaling
-          spacing: Style.marginM * root.scaling
+          active: true
+          sourceComponent: verticalMode ? verticalContent : horizontalContent
+        }
 
-          NIcon {
-            icon: root.getIcon()
-            color: root.getIconColor()
-            font.pointSize: Style.fontSizeXL * root.scaling
-            Layout.alignment: Qt.AlignVCenter
+        Component {
+          id: horizontalContent
+          Item {
+            anchors.fill: parent
 
-            // Smooth icon transitions
-            Behavior on color {
-              ColorAnimation {
-                duration: Style.animationNormal
-                easing.type: Easing.InOutQuad
-              }
-            }
-          }
+            RowLayout {
+              anchors.left: parent.left
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              anchors.margins: Style.marginM * root.scaling
+              spacing: Style.marginM * root.scaling
 
-          RowLayout {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-            spacing: Style.marginXS * root.scaling
-
-            Rectangle {
-              Layout.fillWidth: true
-              Layout.preferredHeight: Math.round(6 * root.scaling)
-              radius: Math.round(3 * root.scaling)
-              color: Color.mSurfaceVariant
-
-              Rectangle {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: parent.width * Math.min(1.0, root.getCurrentValue())
-                radius: parent.radius
-                color: root.getProgressColor()
-
-                Behavior on width {
-                  NumberAnimation {
-                    duration: Style.animationNormal
-                    easing.type: Easing.InOutQuad
-                  }
-                }
+              NIcon {
+                icon: root.getIcon()
+                color: root.getIconColor()
+                pointSize: Style.fontSizeXL * root.scaling
+                Layout.alignment: Qt.AlignVCenter
 
                 Behavior on color {
                   ColorAnimation {
@@ -226,14 +263,141 @@ Variants {
                   }
                 }
               }
+
+              // Progress bar with calculated width
+              Rectangle {
+                Layout.preferredWidth: Math.round(220 * root.scaling)
+                height: panel.barThickness
+                radius: Math.round(panel.barThickness / 2)
+                color: Color.mSurfaceVariant
+                Layout.alignment: Qt.AlignVCenter
+
+                Rectangle {
+                  anchors.left: parent.left
+                  anchors.top: parent.top
+                  anchors.bottom: parent.bottom
+                  width: parent.width * Math.min(1.0, root.getCurrentValue())
+                  radius: parent.radius
+                  color: root.getProgressColor()
+
+                  Behavior on width {
+                    NumberAnimation {
+                      duration: Style.animationNormal
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+                  Behavior on color {
+                    ColorAnimation {
+                      duration: Style.animationNormal
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+                }
+              }
+
+              // Percentage text
+              NText {
+                text: root.getDisplayPercentage()
+                color: Color.mOnSurface
+                pointSize: Style.fontSizeS * root.scaling
+                family: Settings.data.ui.fontFixed
+                Layout.alignment: Qt.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
+                Layout.preferredWidth: Math.round(50 * root.scaling)
+              }
+            }
+          }
+        }
+
+        Component {
+          id: verticalContent
+          ColumnLayout {
+            // Ensure inner padding respects the rounded corners; avoid clipping the icon/text
+            property int vMargin: (function () {
+              const styleMargin = Math.round(Style.marginL * root.scaling)
+              const cornerGuard = Math.round(osdItem.radius)
+              return Math.max(styleMargin, cornerGuard)
+            })()
+            property int vMarginTop: Math.max(Math.round(osdItem.radius), Math.round(Style.marginS * root.scaling))
+            property int balanceDelta: Math.round(Style.marginS * root.scaling)
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.topMargin: vMarginTop
+            anchors.bottomMargin: vMargin
+            width: (function () {
+              const w = parent.width - (vMargin * 2)
+              return (w % 2 === 0) ? w : w - 1
+            })()
+            spacing: Math.round(Style.marginS * root.scaling)
+
+            // Percentage text at top
+            Item {
+              Layout.fillWidth: true
+              Layout.preferredHeight: percentText.implicitHeight
+              NText {
+                id: percentText
+                text: root.getDisplayPercentage()
+                color: Color.mOnSurface
+                pointSize: Style.fontSizeS * root.scaling
+                family: Settings.data.ui.fontFixed
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+              }
             }
 
-            NText {
-              text: root.getDisplayPercentage()
-              color: Color.mOnSurface
-              font.pointSize: Style.fontSizeS * root.scaling
-              Layout.alignment: Qt.AlignVCenter
-              Layout.minimumWidth: Math.round(32 * root.scaling)
+            // Progress bar
+            Item {
+              Layout.fillWidth: true
+              Layout.fillHeight: true
+              Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                width: panel.barThickness
+                radius: Math.round(panel.barThickness / 2)
+                color: Color.mSurfaceVariant
+
+                Rectangle {
+                  anchors.left: parent.left
+                  anchors.right: parent.right
+                  anchors.bottom: parent.bottom
+                  height: parent.height * Math.min(1.0, root.getCurrentValue())
+                  radius: parent.radius
+                  color: root.getProgressColor()
+
+                  Behavior on height {
+                    NumberAnimation {
+                      duration: Style.animationNormal
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+                  Behavior on color {
+                    ColorAnimation {
+                      duration: Style.animationNormal
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+                }
+              }
+            }
+
+            // Icon at bottom
+            NIcon {
+              icon: root.getIcon()
+              color: root.getIconColor()
+              pointSize: Style.fontSizeXL * root.scaling
+              Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+              Layout.bottomMargin: vMargin + Math.round(Style.marginM * root.scaling) + balanceDelta
+              Behavior on color {
+                ColorAnimation {
+                  duration: Style.animationNormal
+                  easing.type: Easing.InOutQuad
+                }
+              }
             }
           }
         }
@@ -246,10 +410,10 @@ Variants {
           // Make visible and animate in
           osdItem.visible = true
           // Use Qt.callLater to ensure the visible change is processed before animation
-          Qt.callLater(function () {
-            osdItem.opacity = 1
-            osdItem.scale = 1.0
-          })
+          Qt.callLater(() => {
+                         osdItem.opacity = 1
+                         osdItem.scale = 1.0
+                       })
 
           // Start the auto-hide timer
           hideTimer.start()
@@ -303,7 +467,7 @@ Variants {
     // Timer to initialize volume/mute flags after services are ready
     Timer {
       id: initTimer
-      interval: 100 // 100ms delay to allow services to initialize
+      interval: 500
       running: true
       onTriggered: {
         volumeInitialized = true
@@ -343,7 +507,7 @@ Variants {
 
     function showOSD(type) {
       // Check if OSD is enabled in settings and can show on this screen
-      if (!Settings.data.notifications.enableOSD || !canShowOnThisScreen) {
+      if (!Settings.data.osd.enabled || !canShowOnThisScreen) {
         return
       }
 
@@ -360,11 +524,11 @@ Variants {
         root.item.showOSD()
       } else {
         // If item not ready yet, wait for it
-        Qt.callLater(function () {
-          if (root.item) {
-            root.item.showOSD()
-          }
-        })
+        Qt.callLater(() => {
+                       if (root.item) {
+                         root.item.showOSD()
+                       }
+                     })
       }
     }
 

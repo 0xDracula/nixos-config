@@ -28,7 +28,7 @@ Variants {
       }
     }
 
-    active: Settings.isLoaded && BarService.isVisible && modelData && modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
+    active: BarService.isVisible && modelData && modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
 
     sourceComponent: PanelWindow {
       screen: modelData || null
@@ -55,6 +55,12 @@ Variants {
         right: Settings.data.bar.floating && Settings.data.bar.position !== "left" ? Settings.data.bar.marginHorizontal * Style.marginXL * scaling : 0
       }
 
+      Component.onCompleted: {
+        if (modelData && modelData.name) {
+          BarService.registerBar(modelData.name)
+        }
+      }
+
       Item {
         anchors.fill: parent
         clip: true
@@ -68,6 +74,17 @@ Variants {
 
           // Floating bar rounded corners
           radius: Settings.data.bar.floating ? Style.radiusL : 0
+        }
+
+        MouseArea {
+          anchors.fill: parent
+          acceptedButtons: Qt.RightButton
+          onClicked: function (mouse) {
+            if (mouse.button === Qt.RightButton) {
+              controlCenterPanel.toggle(BarService.lookupWidget("ControlCenter"))
+              mouse.accepted = true
+            }
+          }
         }
 
         Loader {

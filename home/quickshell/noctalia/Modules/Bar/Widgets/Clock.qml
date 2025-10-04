@@ -61,12 +61,12 @@ Rectangle {
         spacing: Settings.data.bar.showCapsule ? -4 * scaling : -2 * scaling
         Repeater {
           id: repeater
-          model: Qt.formatDateTime(now, formatHorizontal.trim()).split("\\n")
+          model: Qt.locale().toString(now, formatHorizontal.trim()).split("\\n")
           NText {
             visible: text !== ""
             text: modelData
-            font.family: useMonospacedFont ? Settings.data.ui.fontFixed : Settings.data.ui.fontDefault
-            font.pointSize: {
+            family: useMonospacedFont ? Settings.data.ui.fontFixed : Settings.data.ui.fontDefault
+            pointSize: {
               if (repeater.model.length == 1) {
                 return Style.fontSizeS * scaling
               } else {
@@ -91,12 +91,12 @@ Rectangle {
         anchors.centerIn: parent
         spacing: -2 * scaling
         Repeater {
-          model: Qt.formatDateTime(now, formatVertical.trim()).split(" ")
+          model: Qt.locale().toString(now, formatVertical.trim()).split(" ")
           delegate: NText {
             visible: text !== ""
             text: modelData
-            font.family: useMonospacedFont ? Settings.data.ui.fontFixed : Settings.data.ui.fontDefault
-            font.pointSize: Style.fontSizeS * scaling
+            family: useMonospacedFont ? Settings.data.ui.fontFixed : Settings.data.ui.fontDefault
+            pointSize: Style.fontSizeS * scaling
             font.weight: Style.fontWeightBold
             color: usePrimaryColor ? Color.mPrimary : Color.mOnSurface
             wrapMode: Text.WordWrap
@@ -106,12 +106,6 @@ Rectangle {
       }
     }
   }
-  NTooltip {
-    id: tooltip
-    text: I18n.tr("clock.tooltip")
-    target: clockContainer
-    positionAbove: Settings.data.bar.position === "bottom"
-  }
 
   MouseArea {
     id: clockMouseArea
@@ -120,14 +114,14 @@ Rectangle {
     hoverEnabled: true
     onEntered: {
       if (!PanelService.getPanel("calendarPanel")?.active) {
-        tooltip.show()
+        TooltipService.show(root, I18n.tr("clock.tooltip"), BarService.getTooltipDirection())
       }
     }
     onExited: {
-      tooltip.hide()
+      TooltipService.hide()
     }
     onClicked: {
-      tooltip.hide()
+      TooltipService.hide()
       PanelService.getPanel("calendarPanel")?.toggle(this)
     }
   }

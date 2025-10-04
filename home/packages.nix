@@ -150,5 +150,7 @@
     winetricks
 
     todoist-electron
+    inputs.winboat.packages.${pkgs.system}.winboat
+    okular
   ];
 }

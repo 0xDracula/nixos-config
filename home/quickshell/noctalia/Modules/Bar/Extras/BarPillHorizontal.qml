@@ -46,6 +46,13 @@ Item {
   width: pillHeight + Math.max(0, pill.width - pillOverlap)
   height: pillHeight
 
+  Connections {
+    target: root
+    function onTooltipTextChanged() {
+      TooltipService.updateText(root.tooltipText)
+    }
+  }
+
   Rectangle {
     id: pill
     width: revealed ? pillMaxWidth : 1
@@ -77,8 +84,8 @@ Item {
         return centerX + offset
       }
       text: root.text + root.suffix
-      font.family: Settings.data.ui.fontFixed
-      font.pointSize: textSize
+      family: Settings.data.ui.fontFixed
+      pointSize: textSize
       font.weight: Style.fontWeightBold
       color: forceOpen ? Color.mOnSurface : Color.mPrimary
       visible: revealed
@@ -119,7 +126,7 @@ Item {
 
     NIcon {
       icon: root.icon
-      font.pointSize: iconSize
+      pointSize: iconSize
       color: hovered ? Color.mOnTertiary : Color.mOnSurface
       // Center horizontally
       x: (iconCircle.width - width) / 2
@@ -195,14 +202,6 @@ Item {
     }
   }
 
-  NTooltip {
-    id: tooltip
-    positionAbove: Settings.data.bar.position === "bottom"
-    target: pill
-    delay: Style.tooltipDelayLong
-    text: root.tooltipText
-  }
-
   Timer {
     id: showTimer
     interval: Style.pillDelay
@@ -220,7 +219,7 @@ Item {
     onEntered: {
       hovered = true
       root.entered()
-      tooltip.show()
+      TooltipService.show(pill, root.tooltipText, BarService.getTooltipDirection(), Style.tooltipDelayLong)
       if (disableOpen || forceClose) {
         return
       }
@@ -234,7 +233,7 @@ Item {
       if (!forceOpen && !forceClose) {
         hide()
       }
-      tooltip.hide()
+      TooltipService.hide()
     }
     onClicked: function (mouse) {
       if (mouse.button === Qt.LeftButton) {

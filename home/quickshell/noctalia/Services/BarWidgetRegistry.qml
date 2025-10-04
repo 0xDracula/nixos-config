@@ -109,6 +109,11 @@ Singleton {
                                     "showNetworkStats": false,
                                     "showDiskUsage": false
                                   },
+                                  "Taskbar": {
+                                    "allowUserSettings": true,
+                                    "onlySameOutput": true,
+                                    "onlyActiveWorkspaces": true
+                                  },
                                   "Workspace": {
                                     "allowUserSettings": true,
                                     "labelMode": "index",
@@ -195,6 +200,10 @@ Singleton {
   }
   property Component taskbarComponent: Component {
     Taskbar {}
+  }
+
+  function init() {
+    Logger.log("BarWidgetRegistry", "Service started")
   }
 
   // ------------------------------

@@ -15,8 +15,6 @@ Popup {
   property var widgetData: null
   property string widgetId: ""
 
-  property bool isMasked: false
-
   // Center popup in parent
   x: (parent.width - width) * 0.5
   y: (parent.height - height) * 0.5
@@ -43,7 +41,6 @@ Popup {
   background: Rectangle {
     id: bgRect
 
-    opacity: widgetSettings.isMasked ? 0 : 1.0
     color: Color.mSurface
     radius: Style.radiusL * scaling
     border.color: Color.mPrimary
@@ -53,7 +50,6 @@ Popup {
   contentItem: ColumnLayout {
     id: content
 
-    opacity: widgetSettings.isMasked ? 0 : 1.0
     width: parent.width
     spacing: Style.marginM * scaling
 
@@ -65,7 +61,7 @@ Popup {
         text: I18n.tr("system.widget-settings-title", {
                         "widget": widgetSettings.widgetId
                       })
-        font.pointSize: Style.fontSizeL * scaling
+        pointSize: Style.fontSizeL * scaling
         font.weight: Style.fontWeightBold
         color: Color.mPrimary
         Layout.fillWidth: true
@@ -73,6 +69,7 @@ Popup {
 
       NIconButton {
         icon: "close"
+        tooltipText: "Close"
         onClicked: widgetSettings.close()
       }
     }
@@ -136,7 +133,8 @@ Popup {
       "Spacer": "WidgetSettings/SpacerSettings.qml",
       "SystemMonitor": "WidgetSettings/SystemMonitorSettings.qml",
       "Volume": "WidgetSettings/VolumeSettings.qml",
-      "Workspace": "WidgetSettings/WorkspaceSettings.qml"
+      "Workspace": "WidgetSettings/WorkspaceSettings.qml",
+      "Taskbar": "WidgetSettings/TaskbarSettings.qml"
     }
 
     const source = widgetSettingsMap[widgetId]

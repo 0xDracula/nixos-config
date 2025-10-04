@@ -42,6 +42,21 @@ Item {
   // Fixed width - no expansion
   readonly property real widgetWidth: Math.max(1, screen.width * 0.06)
 
+  readonly property string tooltipText: {
+    var title = getTitle()
+    var controls = ""
+    if (MediaService.canGoNext) {
+      controls += "Right click for next.\n"
+    }
+    if (MediaService.canGoPrevious) {
+      controls += "Middle click for previous."
+    }
+    if (controls !== "") {
+      return title + "\n\n" + controls
+    }
+    return title
+  }
+
   implicitHeight: visible ? ((barPosition === "left" || barPosition === "right") ? calculatedVerticalHeight() : Math.round(Style.barHeight * scaling)) : 0
   implicitWidth: visible ? ((barPosition === "left" || barPosition === "right") ? Math.round(Style.baseWidgetSize * 0.8 * scaling) : (widgetWidth * scaling)) : 0
 
@@ -142,7 +157,7 @@ Item {
         NIcon {
           id: windowIcon
           icon: MediaService.isPlaying ? "media-pause" : "media-play"
-          font.pointSize: Style.fontSizeL * scaling
+          pointSize: Style.fontSizeL * scaling
           verticalAlignment: Text.AlignVCenter
           Layout.alignment: Qt.AlignVCenter
           visible: !showAlbumArt && getTitle() !== "" && !trackArt.visible
@@ -254,13 +269,13 @@ Item {
             property real scrollX: 0
             x: scrollX
 
-            Row {
+            RowLayout {
               spacing: 50 * scaling // Gap between text copies
 
               NText {
                 id: titleText
                 text: getTitle()
-                font.pointSize: Style.fontSizeS * scaling
+                pointSize: Style.fontSizeS * scaling
                 font.weight: Style.fontWeightMedium
                 verticalAlignment: Text.AlignVCenter
                 color: Color.mOnSurface
@@ -327,7 +342,7 @@ Item {
             id: mediaIconVertical
             anchors.fill: parent
             icon: MediaService.isPlaying ? "media-pause" : "media-play"
-            font.pointSize: Style.fontSizeL * scaling
+            pointSize: Style.fontSizeL * scaling
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
           }
@@ -360,39 +375,14 @@ Item {
                    }
 
         onEntered: {
-          if ((tooltip.text !== "") && (barPosition === "left" || barPosition === "right")) {
-            tooltip.show()
-          } else if ((tooltip.text !== "") && (scrollingMode === "never")) {
-            tooltip.show()
+          if ((tooltipText !== "") && (barPosition === "left" || barPosition === "right") || (scrollingMode === "never")) {
+            TooltipService.show(root, tooltipText, BarService.getTooltipDirection())
           }
         }
         onExited: {
-          tooltip.hide()
+          TooltipService.hide()
         }
       }
     }
-  }
-
-  NTooltip {
-    id: tooltip
-    text: {
-      var title = getTitle()
-      var controls = ""
-      if (MediaService.canGoNext) {
-        controls += "Right click for next.\n"
-      }
-      if (MediaService.canGoPrevious) {
-        controls += "Middle click for previous."
-      }
-      if (controls !== "") {
-        return title + "\n\n" + controls
-      }
-      return title
-    }
-    target: (barPosition === "left" || barPosition === "right") ? verticalLayout : mediaMini
-    positionLeft: barPosition === "right"
-    positionRight: barPosition === "left"
-    positionAbove: Settings.data.bar.position === "bottom"
-    delay: Style.tooltipDelay
   }
 }

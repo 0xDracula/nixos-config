@@ -31,6 +31,10 @@
         "animation-speed": {
           "label": "Animation speed",
           "description": "Adjust global animation speed."
+        },
+        "animation-disable": {
+          "label": "Disable UI Animations",
+          "description": "Disable all animations for a faster, more responsive experience."
         }
       },
       "screen-corners": {
@@ -52,6 +56,7 @@
         }
       },
       "fonts": {
+        "reset-scaling": "Reset scaling",
         "section": {
           "label": "Fonts",
           "description": "Choose the fonts used throughout the interface."
@@ -60,19 +65,21 @@
           "label": "Default font",
           "description": "Main font used throughout the interface.",
           "placeholder": "Select default font...",
-          "search-placeholder": "Search fonts..."
+          "search-placeholder": "Search font...",
+          "scale": {
+            "label": "Default font size",
+            "description": "Increase or decrease the size of the standard text."
+          }
         },
         "monospace": {
           "label": "Monospaced font",
           "description": "Monospaced font used for numbers and stats display.",
           "placeholder": "Select monospace font...",
-          "search-placeholder": "Search monospace fonts..."
-        },
-        "accent": {
-          "label": "Accent font",
-          "description": "Large font used for prominent displays.",
-          "placeholder": "Select display font...",
-          "search-placeholder": "Search display fonts..."
+          "search-placeholder": "Search monospace font...",
+          "scale": {
+            "label": "Monospaced font size",
+            "description": "Increase or decrease the size of the monospaced text."
+          }
         }
       }
     },
@@ -363,6 +370,40 @@
         }
       }
     },
+    "osd": {
+      "title": "On-Screen Display",
+      "description": "Configure on-screen indicators such as volume and brightness overlays.",
+      "section": {
+        "general": {
+          "label": "General",
+          "description": "Configure visibility and behavior of OSD."
+        }
+      },
+      "enabled": {
+        "label": "Enable on screen display",
+        "description": "Show volume and brightness changes in real-time."
+      },
+      "location": {
+        "label": "Location",
+        "description": "Where on-screen displays appear."
+      },
+      "duration": {
+        "section": {
+          "label": "Auto-hide timeout",
+          "description": "How long OSD remains visible before hiding automatically."
+        },
+        "auto-hide": {
+          "label": "Auto-hide after",
+          "description": "Adjust the time before OSD disappears."
+        }
+      },
+      "monitors": {
+        "section": {
+          "label": "Monitors display",
+          "description": "Show OSD on specific monitors. Defaults to all if none are chosen."
+        }
+      }
+    },
     "wallpaper": {
       "title": "Wallpaper",
       "settings": {
@@ -444,12 +485,16 @@
         "enable-matugen": {
           "label": "Enable Matugen",
           "description": "Automatically generate colors based on your active wallpaper."
+        },
+        "matugen-scheme-type": {
+          "label": "Matugen scheme type",
+          "description": "Choose the color scheme generation algorithm for Matugen."
         }
       },
       "predefined": {
         "section": {
           "label": "Predefined color schemes",
-          "description": "To use these color schemes, you must turn off Matugen. With Matugen enabled, colors are automatically generated from your wallpaper."
+          "description": "Choose from a collection of predefined color schemes."
         }
       },
       "matugen": {
@@ -771,24 +816,57 @@
       },
       "section-editor": {
         "placeholder": "Select a widget to add...",
-        "search-placeholder": "Search widgets..."
+        "search-placeholder": "Search widget..."
       },
       "active-window": {
-        "auto-hide": "Hide automatically",
-        "show-app-icon": "Show app icon",
-        "scrolling-mode": "Scrolling mode"
+        "auto-hide": {
+          "label": "Hide automatically",
+          "description": "Automatically hide the widget when no window is active."
+        },
+        "show-app-icon": {
+          "label": "Show app icon",
+          "description": "Display the application icon next to the window title."
+        },
+        "scrolling-mode": {
+          "label": "Scrolling mode",
+          "description": "Control when text scrolling is enabled for long window titles."
+        }
       },
       "system-monitor": {
-        "cpu-usage": "CPU usage",
-        "cpu-temperature": "CPU temperature",
-        "memory-usage": "Memory usage",
-        "memory-percentage": "Memory as percentage",
-        "network-traffic": "Network traffic",
-        "storage-usage": "Storage usage"
+        "cpu-usage": {
+          "label": "CPU usage",
+          "description": "Display current CPU usage percentage."
+        },
+        "cpu-temperature": {
+          "label": "CPU temperature",
+          "description": "Show CPU temperature readings if available."
+        },
+        "memory-usage": {
+          "label": "Memory usage",
+          "description": "Display current RAM usage information."
+        },
+        "memory-percentage": {
+          "label": "Memory as percentage",
+          "description": "Show memory usage as a percentage instead of absolute values."
+        },
+        "network-traffic": {
+          "label": "Network traffic",
+          "description": "Display network upload and download speeds."
+        },
+        "storage-usage": {
+          "label": "Storage usage",
+          "description": "Show disk space usage information."
+        }
       },
       "notification-history": {
-        "show-unread-badge": "Show unread badge",
-        "hide-badge-when-zero": "Hide badge when zero"
+        "show-unread-badge": {
+          "label": "Show unread badge",
+          "description": "Display a badge showing the number of unread notifications."
+        },
+        "hide-badge-when-zero": {
+          "label": "Hide badge when zero",
+          "description": "Hide the notification badge when there are no unread notifications."
+        }
       },
       "battery": {
         "display-mode": {
@@ -801,7 +879,10 @@
         }
       },
       "control-center": {
-        "use-distro-logo": "Use distro logo instead of icon",
+        "use-distro-logo": {
+          "label": "Use distro logo instead of icon",
+          "description": "Use your distribution's logo instead of a custom icon."
+        },
         "icon": {
           "label": "Icon",
           "description": "Select an icon from the library or a custom file."
@@ -823,7 +904,10 @@
         }
       },
       "workspace": {
-        "label-mode": "Label Mode",
+        "label-mode": {
+          "label": "Label Mode",
+          "description": "Choose how workspace labels are displayed."
+        },
         "hide-unoccupied": {
           "label": "Hide unoccupied",
           "description": "Don't display workspaces without windows."
@@ -853,9 +937,18 @@
           "description": "Select an icon from the library."
         },
         "browse": "Browse",
-        "left-click": "Left click",
-        "right-click": "Right click",
-        "middle-click": "Middle click",
+        "left-click": {
+          "label": "Left click",
+          "description": "Command to execute when the button is left-clicked."
+        },
+        "right-click": {
+          "label": "Right click",
+          "description": "Command to execute when the button is right-clicked."
+        },
+        "middle-click": {
+          "label": "Middle click",
+          "description": "Command to execute when the button is middle-clicked."
+        },
         "dynamic-text": "Dynamic text",
         "display-command-output": {
           "label": "Display Command Output",
@@ -867,11 +960,26 @@
         }
       },
       "media-mini": {
-        "auto-hide": "Hide automatically",
-        "show-album-art": "Show album art",
-        "show-visualizer": "Show visualizer",
-        "visualizer-type": "Visualizer type",
-        "scrolling-mode": "Scrolling mode"
+        "auto-hide": {
+          "label": "Hide automatically",
+          "description": "Automatically hide the widget when no media is playing."
+        },
+        "show-album-art": {
+          "label": "Show album art",
+          "description": "Display the album artwork for the currently playing track."
+        },
+        "show-visualizer": {
+          "label": "Show visualizer",
+          "description": "Display an audio visualizer when music is playing."
+        },
+        "visualizer-type": {
+          "label": "Visualizer type",
+          "description": "Choose the style of audio visualizer to display."
+        },
+        "scrolling-mode": {
+          "label": "Scrolling mode",
+          "description": "Control when text scrolling is enabled for long track titles."
+        }
       },
       "clock": {
         "use-primary-color": {
@@ -895,6 +1003,16 @@
           "description": "Use a space to separate each part onto a new line."
         },
         "preview": "Preview"
+      },
+      "taskbar": {
+        "only-active-workspaces": {
+          "label": "Only from active workspaces",
+          "description": "Show only apps from active workspaces."
+        },
+        "only-same-output": {
+          "label": "Only from same output",
+          "description": "Show only apps from the output where the bar is located."
+        }
       }
     }
   },
@@ -1033,6 +1151,10 @@
       "close": "Close"
     }
   },
+  "launcher": {
+    "pin": "Pin to dock",
+    "unpin": "Unpin from dock"
+  },
   "placeholders": {
     "search-icons": "e.g., noctalia, niri, battery, cloud",
     "profile-picture-path": "/home/user/.face",
@@ -1069,7 +1191,21 @@
         "bottom_left": "Bottom left",
         "bottom_right": "Bottom right",
         "bottom_center": "Bottom center",
-        "top_center": "Top center"
+        "top_center": "Top center",
+        "center_left": "Left center",
+        "center_right": "Right center"
+      }
+    },
+    "osd": {
+      "position": {
+        "top_left": "Top left",
+        "top_right": "Top right",
+        "top_center": "Top center",
+        "bottom_left": "Bottom left",
+        "bottom_right": "Bottom right",
+        "bottom_center": "Bottom center",
+        "center_left": "Left center",
+        "center_right": "Right center"
       }
     },
     "display-mode": {
@@ -1123,13 +1259,18 @@
     "title": "Session Menu",
     "click-again": "Click again to execute immediately",
     "action-in-seconds": "{action} in {seconds} seconds...",
-    "lock-subtitle": "Lock your session",
-    "end-subtitle": "End your session",
     "lock": "Lock",
+    "lock-subtitle": "Lock your session",
+    "lock-and-suspend": "Lock and Suspend",
+    "lock-and-suspend-subtitle": "Lock session and put system to sleep",
     "suspend": "Suspend", 
+    "suspend-subtitle": "Put system to sleep",
     "reboot": "Reboot",
+    "reboot-subtitle": "Restart your computer",
     "logout": "Logout",
-    "shutdown": "Shutdown"
+    "logout-subtitle": "End your session",
+    "shutdown": "Shutdown",
+    "shutdown-subtitle": "Turn off your computer"
   },
   "plugins": {
     "applications": "Applications",
@@ -1233,8 +1374,12 @@
       "unmuted": "Unmuted"
     },
     "battery": {
-      "low": "Low Battery",
+      "low": "Low battery",
       "low-desc": "Battery is at {percent}%. Please connect the charger."
+    },
+    "missing-control-center": {
+      "label": "Last Control Center widget removed",
+      "description": "The Control Center widget has been removed from the bar. To access it from the bar again, you will need to re-add the widget."
     }
   },
   "weather": {

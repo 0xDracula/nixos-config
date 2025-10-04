@@ -44,14 +44,14 @@ Singleton {
     if (Settings.data.matugen.kitty) {
       lines.push("\n[templates.kitty]")
       lines.push('input_path = "' + Quickshell.shellDir + '/Assets/Matugen/templates/kitty.conf"')
-      lines.push('output_path = "~/.config/kitty/colors.conf"')
-      lines.push("post_hook = 'pkill -SIGUSR1 kitty'")
+      lines.push('output_path = "~/.config/kitty/themes/noctalia.conf"')
+      lines.push("post_hook   = 'kitty +kitten themes --reload-in=all noctalia'")
     }
     if (Settings.data.matugen.ghostty) {
       lines.push("\n[templates.ghostty]")
       lines.push('input_path = "' + Quickshell.shellDir + '/Assets/Matugen/templates/ghostty.conf"')
       lines.push('output_path = "~/.config/ghostty/themes/noctalia"')
-      lines.push("post_hook = \"grep -q '^theme *= *' ~/.config/ghostty/config; and sed -i 's/^theme *= *.*/theme = noctalia/' ~/.config/ghostty/config; or echo 'theme = noctalia' >> ~/.config/ghostty/config\"")
+      lines.push("post_hook = \"grep -q '^theme *= *' ~/.config/ghostty/config; and sed -i 's/^theme *= *.*/theme = noctalia/' ~/.config/ghostty/config; or echo 'theme = noctalia' >> ~/.config/ghostty/config; and pkill -SIGUSR2 ghostty\"")
     }
     if (Settings.data.matugen.foot) {
       lines.push("\n[templates.foot]")
@@ -62,7 +62,7 @@ Singleton {
     if (Settings.data.matugen.fuzzel) {
       lines.push("\n[templates.fuzzel]")
       lines.push('input_path = "' + Quickshell.shellDir + '/Assets/Matugen/templates/fuzzel.conf"')
-      lines.push('output_path = "~/.config/fuzzel/colors.ini"')
+      lines.push('output_path = "~/.config/fuzzel/themes/noctalia"')
       lines.push('post_hook = "sed -i /themes/d ~/.config/fuzzel/fuzzel.ini && echo include=~/.config/fuzzel/themes/noctalia >> ~/.config/fuzzel/fuzzel.ini"')
     }
     if (Settings.data.matugen.vesktop) {

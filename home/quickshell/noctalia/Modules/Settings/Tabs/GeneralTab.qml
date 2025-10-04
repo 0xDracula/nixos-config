@@ -41,18 +41,22 @@ ColumnLayout {
       buttonTooltip: "Browse for avatar image"
       onInputEditingFinished: Settings.data.general.avatarImage = text
       onButtonClicked: {
-        filePicker.open()
+        avatarPicker.openFilePicker()
       }
     }
   }
 
   NFilePicker {
-    id: filePicker
-    pickerType: "file"
+    id: avatarPicker
     title: I18n.tr("settings.general.profile.select-avatar")
+    selectionMode: "files"
     initialPath: Settings.data.general.avatarImage.substr(0, Settings.data.general.avatarImage.lastIndexOf("/")) || Quickshell.env("HOME")
-    nameFilters: ["Image files (*.jpg *.jpeg *.png *.gif *.pnm *.bmp *.face)", "All files (*)"]
-    onAccepted: paths => Settings.data.general.avatarImage = paths[0]
+    nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.pnm", "*.bmp"]
+    onAccepted: paths => {
+                  if (paths.length > 0) {
+                    Settings.data.general.avatarImage = paths[0]
+                  }
+                }
   }
 
   NDivider {
@@ -100,22 +104,35 @@ ColumnLayout {
 
     // Animation Speed
     ColumnLayout {
-      spacing: Style.marginXXS * scaling
+      spacing: Style.marginL * scaling
       Layout.fillWidth: true
 
-      NLabel {
-        label: I18n.tr("settings.general.ui.animation-speed.label")
-        description: I18n.tr("settings.general.ui.animation-speed.description")
+      NToggle {
+        label: I18n.tr("settings.general.ui.animation-disable.label")
+        description: I18n.tr("settings.general.ui.animation-disable.description")
+        checked: Settings.data.general.animationDisabled
+        onToggled: checked => Settings.data.general.animationDisabled = checked
       }
 
-      NValueSlider {
+      ColumnLayout {
+        spacing: Style.marginXXS * scaling
         Layout.fillWidth: true
-        from: 0.1
-        to: 2.0
-        stepSize: 0.01
-        value: Settings.data.general.animationSpeed
-        onMoved: value => Settings.data.general.animationSpeed = value
-        text: Math.round(Settings.data.general.animationSpeed * 100) + "%"
+        visible: !Settings.data.general.animationDisabled
+
+        NLabel {
+          label: I18n.tr("settings.general.ui.animation-speed.label")
+          description: I18n.tr("settings.general.ui.animation-speed.description")
+        }
+
+        NValueSlider {
+          Layout.fillWidth: true
+          from: 0.1
+          to: 2.0
+          stepSize: 0.01
+          value: Settings.data.general.animationSpeed
+          onMoved: value => Settings.data.general.animationSpeed = value
+          text: Math.round(Settings.data.general.animationSpeed * 100) + "%"
+        }
       }
     }
   }
@@ -170,6 +187,7 @@ ColumnLayout {
       }
     }
   }
+
   NDivider {
     Layout.fillWidth: true
     Layout.topMargin: Style.marginXL * scaling
@@ -219,25 +237,79 @@ ColumnLayout {
         }
       }
 
-      NSearchableComboBox {
-        label: I18n.tr("settings.general.fonts.accent.label")
-        description: I18n.tr("settings.general.fonts.accent.description")
-        model: FontService.displayFonts
-        currentKey: Settings.data.ui.fontBillboard
-        placeholder: I18n.tr("settings.general.fonts.accent.placeholder")
-        searchPlaceholder: I18n.tr("settings.general.fonts.accent.search-placeholder")
-        popupHeight: 320 * scaling
-        minimumWidth: 300 * scaling
-        onSelected: function (key) {
-          Settings.data.ui.fontBillboard = key
+      ColumnLayout {
+        NLabel {
+          label: I18n.tr("settings.general.fonts.default.scale.label")
+          description: I18n.tr("settings.general.fonts.default.scale.description")
+        }
+
+        RowLayout {
+          spacing: Style.marginL * scaling
+          Layout.fillWidth: true
+
+          NValueSlider {
+            Layout.fillWidth: true
+            from: 0.75
+            to: 1.25
+            stepSize: 0.01
+            value: Settings.data.ui.fontDefaultScale
+            onMoved: value => Settings.data.ui.fontDefaultScale = value
+            text: Math.floor(Settings.data.ui.fontDefaultScale * 100) + "%"
+          }
+
+          // Reset button container
+          Item {
+            Layout.preferredWidth: 30 * scaling
+            Layout.preferredHeight: 30 * scaling
+
+            NIconButton {
+              icon: "refresh"
+              baseSize: Style.baseWidgetSize * 0.9
+              tooltipText: I18n.tr("settings.general.fonts.reset-scaling")
+              onClicked: Settings.data.ui.fontDefaultScale = 1.0
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
+        }
+      }
+
+      ColumnLayout {
+        NLabel {
+          label: I18n.tr("settings.general.fonts.monospace.scale.label")
+          description: I18n.tr("settings.general.fonts.monospace.scale.description")
+        }
+
+        RowLayout {
+          spacing: Style.marginL * scaling
+          Layout.fillWidth: true
+
+          NValueSlider {
+            Layout.fillWidth: true
+            from: 0.75
+            to: 1.25
+            stepSize: 0.01
+            value: Settings.data.ui.fontFixedScale
+            onMoved: value => Settings.data.ui.fontFixedScale = value
+            text: Math.floor(Settings.data.ui.fontFixedScale * 100) + "%"
+          }
+
+          // Reset button container
+          Item {
+            Layout.preferredWidth: 30 * scaling
+            Layout.preferredHeight: 30 * scaling
+
+            NIconButton {
+              icon: "refresh"
+              baseSize: Style.baseWidgetSize * 0.9
+              tooltipText: I18n.tr("settings.general.fonts.reset-scaling")
+              onClicked: Settings.data.ui.fontFixedScale = 1.0
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
         }
       }
     }
-  }
-
-  NDivider {
-    Layout.fillWidth: true
-    Layout.topMargin: Style.marginXL * scaling
-    Layout.bottomMargin: Style.marginXL * scaling
   }
 }

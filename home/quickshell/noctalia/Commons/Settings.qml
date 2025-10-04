@@ -54,7 +54,7 @@ Singleton {
     // Then it should be commented out again, regular users don't need to generate
     // default settings on every start
     // TODO: automate this someday!
-    //generateDefaultSettings()
+    // generateDefaultSettings()
 
     // Patch-in the local default, resolved to user's home
     adapter.general.avatarImage = defaultAvatar
@@ -71,7 +71,13 @@ Singleton {
     id: saveTimer
     running: false
     interval: 1000
-    onTriggered: settingsFileView.writeAdapter()
+    onTriggered: {
+      settingsFileView.writeAdapter()
+      // Write to fallback location if set
+      if (Quickshell.env("NOCTALIA_SETTINGS_FALLBACK")) {
+        settingsFallbackFileView.writeAdapter()
+      }
+    }
   }
 
   FileView {
@@ -90,15 +96,10 @@ Singleton {
     }
     onLoaded: function () {
       if (!isLoaded) {
-        Logger.log("Settings", "----------------------------")
-        Logger.log("Settings", "Settings loaded successfully")
+        Logger.log("Settings", "Settings loaded")
 
         upgradeSettingsData()
-
         validateMonitorConfigurations()
-
-        kickOffServices()
-
         isLoaded = true
 
         // Emit the signal
@@ -106,15 +107,29 @@ Singleton {
       }
     }
     onLoadFailed: function (error) {
-      if (error.toString().includes("No such file") || error === 2)
+      if (error.toString().includes("No such file") || error === 2) {
         // File doesn't exist, create it with default values
         writeAdapter()
+        // Also write to fallback if set
+        if (Quickshell.env("NOCTALIA_SETTINGS_FALLBACK")) {
+          settingsFallbackFileView.writeAdapter()
+        }
+      }
     }
+  }
+
+  // Fallback FileView for writing settings to alternate location
+  FileView {
+    id: settingsFallbackFileView
+    path: Quickshell.env("NOCTALIA_SETTINGS_FALLBACK") || ""
+    adapter: Quickshell.env("NOCTALIA_SETTINGS_FALLBACK") ? adapter : null
+    printErrors: false
+    watchChanges: false
   }
   JsonAdapter {
     id: adapter
 
-    property int settingsVersion: 6
+    property int settingsVersion: 12
 
     // bar
     property JsonObject bar: JsonObject {
@@ -159,8 +174,6 @@ Singleton {
           }, {
             "id": "Brightness"
           }, {
-            "id": "NightLight"
-          }, {
             "id": "Clock"
           }, {
             "id": "ControlCenter"
@@ -177,6 +190,7 @@ Singleton {
       property real radiusRatio: 1.0
       property real screenRadiusRatio: 1.0
       property real animationSpeed: 1.0
+      property bool animationDisabled: false
     }
 
     // location
@@ -241,7 +255,6 @@ Singleton {
     // network
     property JsonObject network: JsonObject {
       property bool wifiEnabled: true
-      property bool bluetoothEnabled: true
     }
 
     // notifications
@@ -255,7 +268,14 @@ Singleton {
       property int lowUrgencyDuration: 3
       property int normalUrgencyDuration: 8
       property int criticalUrgencyDuration: 15
-      property bool enableOSD: true
+    }
+
+    // on-screen display
+    property JsonObject osd: JsonObject {
+      property bool enabled: true
+      property string location: "top_right"
+      property list<string> monitors: []
+      property int autoHideMs: 2000
     }
 
     // audio
@@ -272,7 +292,8 @@ Singleton {
     property JsonObject ui: JsonObject {
       property string fontDefault: "Roboto"
       property string fontFixed: "DejaVu Sans Mono"
-      property string fontBillboard: "Inter"
+      property real fontDefaultScale: 1.0
+      property real fontFixedScale: 1.0
       property list<var> monitorsScaling: []
       property bool idleInhibitorEnabled: false
     }
@@ -286,6 +307,7 @@ Singleton {
       property bool useWallpaperColors: false
       property string predefinedScheme: "Noctalia (default)"
       property bool darkMode: true
+      property string matugenSchemeType: "scheme-fruit-salad"
     }
 
     // matugen templates toggles
@@ -380,6 +402,12 @@ Singleton {
   // If the settings structure has changed, ensure
   // backward compatibility by upgrading the settings
   function upgradeSettingsData() {
+    // Wait for BarWidgetRegistry to be ready
+    if (!BarWidgetRegistry.widgets || Object.keys(BarWidgetRegistry.widgets).length === 0) {
+      Logger.warn("Settings", "BarWidgetRegistry not ready, deferring upgrade")
+      Qt.callLater(upgradeSettingsData)
+      return
+    }
 
     const sections = ["left", "center", "right"]
 
@@ -409,6 +437,7 @@ Singleton {
 
     // -----------------
     // 2nd. remove any non existing widget type
+    var removedWidget = false
     for (var s = 0; s < sections.length; s++) {
       const sectionName = sections[s]
       const widgets = adapter.bar.widgets[sectionName]
@@ -418,12 +447,13 @@ Singleton {
         if (!BarWidgetRegistry.hasWidget(widget.id)) {
           Logger.warn(`Settings`, `Deleted invalid widget ${widget.id}`)
           widgets.splice(i, 1)
+          removedWidget = true
         }
       }
     }
 
     // -----------------
-    // 3nd. migrate global settings to user settings
+    // 3nd. upgrade widget settings
     for (var s = 0; s < sections.length; s++) {
       const sectionName = sections[s]
       for (var i = 0; i < adapter.bar.widgets[sectionName].length; i++) {
@@ -441,11 +471,29 @@ Singleton {
       }
     }
 
-    // Upgrade the density of the bar so the look stay the same for people who upgrade.
-    // TODO: remove soon
-    if (adapter.settingsVersion == 2) {
-      adapter.bar.density = "comfortable"
-      adapter.settingsVersion++
+    // -----------------
+    // 4th. safety check
+    // if a widget was deleted, ensure we still have a control center
+    if (removedWidget) {
+      var gotControlCenter = false
+      for (var s = 0; s < sections.length; s++) {
+        const sectionName = sections[s]
+        for (var i = 0; i < adapter.bar.widgets[sectionName].length; i++) {
+          var widget = adapter.bar.widgets[sectionName][i]
+          if (widget.id === "ControlCenter") {
+            gotControlCenter = true
+            break
+          }
+        }
+      }
+
+      if (!gotControlCenter) {
+        //const obj = JSON.parse('{"id": "ControlCenter"}');
+        adapter.bar.widgets["right"].push(({
+                                             "id": "ControlCenter"
+                                           }))
+        Logger.warn("Settings", "Added a ControlCenter widget to the right section")
+      }
     }
   }
 
@@ -453,16 +501,6 @@ Singleton {
   function upgradeWidget(widget) {
     // Backup the widget definition before altering
     const widgetBefore = JSON.stringify(widget)
-
-    switch (widget.id) {
-      // Get back to global settings for these two clock settings
-    case "Clock":
-      if (widget.use12HourClock !== undefined) {
-        adapter.location.use12hourFormat = widget.use12HourClock
-        delete widget.use12HourClock
-      }
-      break
-    }
 
     // Get all existing custom settings keys
     const keys = Object.keys(BarWidgetRegistry.widgetMetadata[widget.id])
@@ -492,18 +530,5 @@ Singleton {
     // Compare settings, to detect if something has been upgraded
     const widgetAfter = JSON.stringify(widget)
     return (widgetAfter !== widgetBefore)
-  }
-
-  // -----------------------------------------------------
-  // Kickoff essential services
-  function kickOffServices() {
-    LocationService.init()
-    NightLightService.apply()
-    ColorSchemeService.init()
-    MatugenService.init()
-    WallpaperService.init()
-    FontService.init()
-    HooksService.init()
-    BluetoothService.init()
   }
 }

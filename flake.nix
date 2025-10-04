@@ -36,6 +36,10 @@
       url = "github:AvengeMedia/danklinux";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    winboat = {
+      url = "github:TibixDev/winboat";
+      inputs.nixospkgs.follows = "nixpkgs";
+    };
   };
   outputs =
     {

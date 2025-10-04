@@ -77,7 +77,7 @@ ColumnLayout {
               text: (modelData.name || "Unknown")
               color: Color.mPrimary
               font.weight: Style.fontWeightBold
-              font.pointSize: Style.fontSizeM * scaling
+              pointSize: Style.fontSizeM * scaling
             }
 
             NTextInputButton {
@@ -327,7 +327,7 @@ ColumnLayout {
       id: chipLabel
       anchors.centerIn: parent
       text: parent.label
-      font.pointSize: Style.fontSizeS * scaling
+      pointSize: Style.fontSizeS * scaling
       color: parent.selected ? Color.mOnPrimary : Color.mOnSurface
     }
   }
@@ -340,15 +340,25 @@ ColumnLayout {
 
   NFilePicker {
     id: mainFolderPicker
-    pickerType: "folder"
+    selectionMode: "folders"
     title: I18n.tr("settings.wallpaper.settings.select-folder")
-    onAccepted: paths => Settings.data.wallpaper.directory = paths[0]
+    initialPath: Settings.data.wallpaper.directory || Quickshell.env("HOME") + "/Pictures"
+    onAccepted: paths => {
+                  if (paths.length > 0) {
+                    Settings.data.wallpaper.directory = paths[0]
+                  }
+                }
   }
 
   NFilePicker {
     id: monitorFolderPicker
-    pickerType: "folder"
+    selectionMode: "folders"
     title: I18n.tr("settings.wallpaper.settings.select-monitor-folder")
-    onAccepted: paths => WallpaperService.setMonitorDirectory(specificFolderMonitorName, paths[0])
+    initialPath: WallpaperService.getMonitorDirectory(specificFolderMonitorName) || Quickshell.env("HOME") + "/Pictures"
+    onAccepted: paths => {
+                  if (paths.length > 0) {
+                    WallpaperService.setMonitorDirectory(specificFolderMonitorName, paths[0])
+                  }
+                }
   }
 }

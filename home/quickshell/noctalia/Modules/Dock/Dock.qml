@@ -14,8 +14,19 @@ Variants {
 
   delegate: Item {
     id: root
+
     required property ShellScreen modelData
     property real scaling: ScalingService.getScreenScale(modelData)
+    property bool barIsReady: BarService.isBarReady(modelData.name)
+
+    Connections {
+      target: BarService
+      function onBarReadyChanged(screenName) {
+        if (screenName === modelData.name) {
+          barIsReady = true
+        }
+      }
+    }
 
     Connections {
       target: ScalingService
@@ -44,15 +55,7 @@ Variants {
 
     // Initial update when component is ready
     Component.onCompleted: {
-      if (Settings.isLoaded && ToplevelManager) {
-        updateDockApps()
-      }
-    }
-
-    // Update when Settings are loaded
-    Connections {
-      target: Settings
-      function onSettingsLoaded() {
+      if (ToplevelManager) {
         updateDockApps()
       }
     }
@@ -187,7 +190,7 @@ Variants {
 
     // PEEK WINDOW - Always visible when auto-hide is enabled
     Loader {
-      active: Settings.isLoaded && modelData && Settings.data.dock.monitors.includes(modelData.name) && autoHide
+      active: barIsReady && modelData && Settings.data.dock.monitors.includes(modelData.name) && autoHide
 
       sourceComponent: PanelWindow {
         id: peekWindow
@@ -233,7 +236,7 @@ Variants {
 
     // DOCK WINDOW
     Loader {
-      active: Settings.isLoaded && modelData && Settings.data.dock.monitors.includes(modelData.name) && dockLoaded && ToplevelManager && (dockApps.length > 0)
+      active: barIsReady && modelData && Settings.data.dock.monitors.includes(modelData.name) && dockLoaded && ToplevelManager && (dockApps.length > 0)
 
       sourceComponent: PanelWindow {
         id: dockWindow
@@ -373,14 +376,6 @@ Variants {
                       }
                     }
 
-                    // Individual tooltip for this app
-                    NTooltip {
-                      id: appTooltip
-                      target: appButton
-                      positionAbove: true
-                      visible: false
-                    }
-
                     Image {
                       id: appIcon
                       width: iconSize
@@ -422,7 +417,7 @@ Variants {
                       anchors.centerIn: parent
                       visible: !appIcon.visible
                       icon: "question-mark"
-                      font.pointSize: iconSize * 0.7
+                      pointSize: iconSize * 0.7
                       color: appButton.isActive ? Color.mPrimary : Color.mOnSurfaceVariant
                       opacity: appButton.isRunning ? 1.0 : 0.6
                       scale: appButton.hovered ? 1.15 : 1.0
@@ -481,8 +476,8 @@ Variants {
                       onEntered: {
                         anyAppHovered = true
                         const appName = appButton.appTitle || appButton.appId || "Unknown"
-                        appTooltip.text = appName.length > 40 ? appName.substring(0, 37) + "..." : appName
-                        appTooltip.isVisible = true
+                        const tooltipText = appName.length > 40 ? appName.substring(0, 37) + "..." : appName
+                        TooltipService.show(appButton, tooltipText, "top")
                         if (autoHide) {
                           showTimer.stop()
                           hideTimer.stop()
@@ -492,7 +487,7 @@ Variants {
 
                       onExited: {
                         anyAppHovered = false
-                        appTooltip.hide()
+                        TooltipService.hide()
                         if (autoHide && !dockHovered && !peekHovered && !menuHovered) {
                           hideTimer.restart()
                         }
@@ -508,7 +503,7 @@ Variants {
                           // Close any other existing context menu first
                           root.closeAllContextMenus()
                           // Hide tooltip when showing context menu
-                          appTooltip.hide()
+                          TooltipService.hide()
                           contextMenu.show(appButton, modelData.toplevel || modelData)
                           return
                         }
