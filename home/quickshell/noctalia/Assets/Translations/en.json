@@ -2,7 +2,7 @@
   "settings": {
     "general": {
       "title": "General",
-      
+
       "profile": {
         "section": {
           "label": "Profile",
@@ -19,6 +19,10 @@
         "section": {
           "label": "User interface",
           "description": "Customize the look, feel, and behavior of the interface."
+        },
+        "tooltips": {
+          "label": "Show tooltips",
+          "description": "Enable or disable tooltips throughout the interface."
         },
         "dim-desktop": {
           "label": "Dim desktop",
@@ -80,6 +84,16 @@
             "label": "Monospaced font size",
             "description": "Increase or decrease the size of the monospaced text."
           }
+        }
+      },
+      "control-center": {
+        "section": {
+          "label": "Control Center",
+          "description": "Configure the Control Center panel positioning and behavior."
+        },
+        "position": {
+          "label": "Position",
+          "description": "Choose where the Control Center panel appears when opened."
         }
       }
     },
@@ -264,13 +278,12 @@
           "label": "Appearance",
           "description": "Customize the dock's behavior and appearance."
         },
-        "auto-hide": {
-          "label": "Auto-hide",
-          "description": "Automatically hide when not in use."
-        },
-        "exclusive-zone": {
-          "label": "Exclusive zone",
-          "description": "Prevent window overlap."
+        "display": {
+          "label": "Display",
+          "description": "Choose how the dock behaves.",
+          "always-visible": "Always visible",
+          "auto-hide": "Auto hide",
+          "exclusive": "Exclusive"
         },
         "background-opacity": {
           "label": "Background opacity",
@@ -285,6 +298,10 @@
         "section": {
           "label": "Monitor display",
           "description": "Choose which monitor to display the dock on."
+        },
+        "only-same-output": {
+          "label": "Only apps from same output",
+          "description": "Show only apps from the output where the dock is located."
         }
       }
     },
@@ -314,6 +331,10 @@
         "use-app2unit": {
           "label": "Use App2Unit to launch applications",
           "description": "Uses an alternative launch method to better manage app processes and prevent issues."
+        },
+        "terminal-command": {
+          "label": "Terminal command",
+          "description": "Command to launch a terminal. E.g., 'kitty -e' or 'gnome-terminal --'."
         }
       }
     },
@@ -482,9 +503,9 @@
           "label": "Dark mode",
           "description": "Switches to a darker theme for easier viewing at night."
         },
-        "enable-matugen": {
-          "label": "Enable Matugen",
-          "description": "Automatically generate colors based on your active wallpaper."
+        "use-wallpaper-colors": {
+          "label": "Use wallpaper colors",
+          "description": "Generate color schemes from your wallpaper using Matugen. Automatically extracts colors to create a cohesive theme."
         },
         "matugen-scheme-type": {
           "label": "Matugen scheme type",
@@ -495,26 +516,24 @@
         "section": {
           "label": "Predefined color schemes",
           "description": "Choose from a collection of predefined color schemes."
+        },
+        "generate-templates": {
+          "label": "Generate templates for predefined schemes",
+          "description": "Generate Matugen templates (GTK, terminal themes, etc.) when using predefined color schemes."
         }
       },
-      "matugen": {
+      "templates": {
         "section": {
-          "label": "Matugen templates",
+          "label": "Templates",
           "description": "Apply colors to external applications."
         },
         "ui": {
           "label": "UI",
           "description": "Desktop environment and UI toolkit theming.",
-          "gtk4": {
+          "gtk": {
             "description": "Write {filepath}"
           },
-          "gtk3": {
-            "description": "Write {filepath}"
-          },
-          "qt6": {
-            "description": "Write {filepath}"
-          },
-          "qt5": {
+          "qt": {
             "description": "Write {filepath}"
           }
         },
@@ -589,7 +608,7 @@
           "description": "Customize how date and time appear."
         },
         "12hour-format": {
-          "label": "Use 12-hour time format on the lock screen",
+          "label": "Use 12-hour time format",
           "description": "On for AM/PM format (e.g., 8:00 PM), off for 24-hour format (e.g., 20:00)."
         },
         "week-numbers": {
@@ -830,6 +849,10 @@
         "scrolling-mode": {
           "label": "Scrolling mode",
           "description": "Control when text scrolling is enabled for long window titles."
+        },
+        "width": {
+          "label": "Widget Width",
+          "description": "Controls the horizontal size of the widget."
         }
       },
       "system-monitor": {
@@ -979,7 +1002,8 @@
         "scrolling-mode": {
           "label": "Scrolling mode",
           "description": "Control when text scrolling is enabled for long track titles."
-        }
+        },
+        "no-active-player": "No active player"
       },
       "clock": {
         "use-primary-color": {
@@ -989,6 +1013,16 @@
         "use-monospaced-font": {
           "label": "Use monospaced font",
           "description": "When enabled, the clock will use the monospaced font."
+        },
+        "use-custom-font": {
+          "label": "Use custom font",
+          "description": "Override the default font selection with a custom font for the clock."
+        },
+        "custom-font": {
+          "label": "Custom font",
+          "description": "Select a custom font for the clock display.",
+          "placeholder": "Select custom font...",
+          "search-placeholder": "Search fonts..."
         },
         "clock-display": {
           "label": "Clock display",
@@ -1020,7 +1054,8 @@
     "panel": {
       "title": "Notifications",
       "no-notifications": "No notifications",
-      "description": "Your notifications will show up here as they arrive."
+      "description": "Your notifications will show up here as they arrive.",
+      "click-to-expand": "Click to expand"
     }
   },
   "wallpaper": {
@@ -1123,6 +1158,7 @@
     "night-light-disabled": "Night light is disabled.\nLeft click to cycle mode.\nRight click to access settings.",
     "night-light-enabled": "Night light is enabled.\nLeft click to cycle mode.\nRight click to access settings.",
     "night-light-forced": "Night light is forced.\nLeft click to cycle mode.\nRight click to access settings.",
+    "night-light-not-installed": "Night light is not available.\nwlsunset is not installed.",
     "click-to-start-recording": "Click to start recording",
     "click-to-stop-recording": "Click to stop recording",
     "open-control-center": "Open control center",
@@ -1161,7 +1197,7 @@
     "enter-width-pixels": "Enter width in pixels",
     "enter-command": "Enter command to execute (app or custom script)",
     "command-example": "echo \"Hello World\"",
-    
+
     "search-wallpapers": "Type to filter wallpapers...",
     "search-launcher": "Search entries... or use > for commands",
     "search": "Search...",
@@ -1194,6 +1230,17 @@
         "top_center": "Top center",
         "center_left": "Left center",
         "center_right": "Right center"
+      }
+    },
+    "control-center": {
+      "position": {
+        "close_to_bar_button": "Close to bar button",
+        "top_left": "Top left",
+        "top_right": "Top right",
+        "bottom_left": "Bottom left",
+        "bottom_right": "Bottom right",
+        "bottom_center": "Bottom center",
+        "top_center": "Top center"
       }
     },
     "osd": {
@@ -1263,7 +1310,7 @@
     "lock-subtitle": "Lock your session",
     "lock-and-suspend": "Lock and Suspend",
     "lock-and-suspend-subtitle": "Lock session and put system to sleep",
-    "suspend": "Suspend", 
+    "suspend": "Suspend",
     "suspend-subtitle": "Put system to sleep",
     "reboot": "Reboot",
     "reboot-subtitle": "Restart your computer",
@@ -1291,7 +1338,7 @@
   },
   "system": {
     "uptime": "System uptime: {uptime}",
-    "welcome-back": "Welcome back, {user}!",
+    "welcome-back": "Welcome back,",
     "monitor-description": "{model} ({width}x{height})",
     "scaling-percentage": "{percentage}%",
     "location-display": "{name} ({coordinates})",
@@ -1307,9 +1354,10 @@
     "unknown-layout": "Unknown"
   },
   "lock-screen": {
-    "secure-terminal": "SECURE TERMINAL",
-    "unlock-command": "sudo unlock-session",
-    "password": "Password:",
+    "password": "Enter your password...",
+    "welcome-back": "Welcome back,",
+    "authenticating": "Authenticating...",
+    "authentication-failed": "Authentication failed",
     "shut-down": "Shut down",
     "restart": "Restart",
     "suspend": "Suspend"
@@ -1326,10 +1374,10 @@
       "enabled": "Enabled",
       "disabled": "Disabled"
     },
-    "matugen": {
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "not-installed": "Not installed"
+    "wallpaper-colors": {
+      "enabled": "Wallpaper colors enabled",
+      "disabled": "Wallpaper colors disabled",
+      "not-installed": "Matugen not installed - required for wallpaper color extraction"
     },
     "recording": {
       "stopping": "Stopping recording…",
@@ -1339,7 +1387,9 @@
       "failed-gpu": "gpu-screen-recorder exited unexpectedly.",
       "failed-general": "The recorder exited with an error.",
       "no-portals": "Desktop portals not running",
-      "no-portals-desc": "Start xdg-desktop-portal and a compositor portal (wlr/hyprland/gnome/kde)."
+      "no-portals-desc": "Start xdg-desktop-portal and a compositor portal (wlr/hyprland/gnome/kde).",
+      "not-installed": "gpu-screen-recorder not installed",
+      "not-installed-desc": "Please install gpu-screen-recorder to use screen recording features."
     },
     "clipboard": {
       "unavailable": "Clipboard history unavailable",
@@ -1379,12 +1429,12 @@
     },
     "missing-control-center": {
       "label": "Last Control Center widget removed",
-      "description": "The Control Center widget has been removed from the bar. To access it from the bar again, you will need to re-add the widget."
+      "description": "The Control Center widget has been removed from the bar. To access it from the bar again, you will need to re-add the widget. You can open it with right clicking on the bar too."
     }
   },
   "weather": {
     "clear-sky": "Clear sky",
-    "mainly-clear": "Mainly clear", 
+    "mainly-clear": "Mainly clear",
     "partly-cloudy": "Partly cloudy",
     "overcast": "Overcast",
     "fog": "Fog",
@@ -1394,7 +1444,7 @@
     "thunderstorm": "Thunderstorm",
     "unknown": "Unknown"
   },
-  
+
   "authentication": {
     "failed": "Authentication failed",
     "error": "Authentication error"

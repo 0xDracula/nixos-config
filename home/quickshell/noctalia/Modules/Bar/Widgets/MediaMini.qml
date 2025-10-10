@@ -40,7 +40,10 @@ Item {
   readonly property string scrollingMode: (widgetSettings.scrollingMode !== undefined) ? widgetSettings.scrollingMode : widgetMetadata.scrollingMode
 
   // Fixed width - no expansion
-  readonly property real widgetWidth: Math.max(1, screen.width * 0.06)
+  readonly property real widgetWidth: Math.max(145, screen.width * 0.06)
+
+  readonly property bool hasActivePlayer: MediaService.currentPlayer !== null && getTitle() !== ""
+  readonly property string placeholderText: I18n.tr("bar.widget-settings.media-mini.no-active-player")
 
   readonly property string tooltipText: {
     var title = getTitle()
@@ -60,7 +63,7 @@ Item {
   implicitHeight: visible ? ((barPosition === "left" || barPosition === "right") ? calculatedVerticalHeight() : Math.round(Style.barHeight * scaling)) : 0
   implicitWidth: visible ? ((barPosition === "left" || barPosition === "right") ? Math.round(Style.baseWidgetSize * 0.8 * scaling) : (widgetWidth * scaling)) : 0
 
-  opacity: !autoHide || getTitle() !== "" ? 1.0 : 0
+  opacity: !autoHide || hasActivePlayer || (!hasActivePlayer && !autoHide) ? 1.0 : 0
   Behavior on opacity {
     NumberAnimation {
       duration: Style.animationNormal
@@ -151,26 +154,27 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter
         spacing: Style.marginS * scaling
-        visible: (barPosition === "top" || barPosition === "bottom") && getTitle() !== ""
+        visible: (barPosition === "top" || barPosition === "bottom")
         z: 1 // Above the visualizer
 
         NIcon {
           id: windowIcon
-          icon: MediaService.isPlaying ? "media-pause" : "media-play"
+          icon: hasActivePlayer ? (MediaService.isPlaying ? "media-pause" : "media-play") : "disc"
+          color: hasActivePlayer ? Color.mOnSurface : Color.mOnSurfaceVariant
           pointSize: Style.fontSizeL * scaling
           verticalAlignment: Text.AlignVCenter
           Layout.alignment: Qt.AlignVCenter
-          visible: !showAlbumArt && getTitle() !== "" && !trackArt.visible
+          visible: !hasActivePlayer || (!showAlbumArt && !trackArt.visible)
         }
 
         ColumnLayout {
           Layout.alignment: Qt.AlignVCenter
-          visible: showAlbumArt
+          visible: showAlbumArt && hasActivePlayer
           spacing: 0
 
           Item {
-            Layout.preferredWidth: Math.round(18 * scaling)
-            Layout.preferredHeight: Math.round(18 * scaling)
+            Layout.preferredWidth: Math.round(21 * scaling)
+            Layout.preferredHeight: Math.round(21 * scaling)
 
             NImageCircled {
               id: trackArt
@@ -189,7 +193,7 @@ Item {
           Layout.preferredWidth: {
             // Calculate available width based on other elements in the row
             var iconWidth = (windowIcon.visible ? (Style.fontSizeL * scaling + Style.marginS * scaling) : 0)
-            var albumArtWidth = (showAlbumArt ? (18 * scaling + Style.marginS * scaling) : 0)
+            var albumArtWidth = (hasActivePlayer && showAlbumArt ? (18 * scaling + Style.marginS * scaling) : 0)
             var totalMargins = Style.marginXXS * scaling * 2
             var availableWidth = mainContainer.width - iconWidth - albumArtWidth - totalMargins
             return Math.max(20 * scaling, availableWidth)
@@ -203,8 +207,8 @@ Item {
           property bool isScrolling: false
           property bool isResetting: false
           property real textWidth: fullTitleMetrics.contentWidth
-          property real containerWidth: width
-          property bool needsScrolling: textWidth > containerWidth
+          property real containerWidth: 0
+          property bool needsScrolling: textWidth > containerWidth && MediaService.isPlaying
 
           // Timer for "always" mode with delay
           Timer {
@@ -250,8 +254,15 @@ Item {
             }
           }
 
-          onWidthChanged: updateScrollingState()
-          Component.onCompleted: updateScrollingState()
+          onWidthChanged: {
+            containerWidth = width
+            updateScrollingState()
+          }
+
+          Component.onCompleted: {
+            containerWidth = width
+            updateScrollingState()
+          }
 
           Connections {
             target: mouseArea
@@ -264,7 +275,7 @@ Item {
           Item {
             id: scrollContainer
             height: parent.height
-            width: childrenRect.width
+            width: parent.width
 
             property real scrollX: 0
             x: scrollX
@@ -274,19 +285,21 @@ Item {
 
               NText {
                 id: titleText
-                text: getTitle()
+                text: hasActivePlayer ? getTitle() : placeholderText
                 pointSize: Style.fontSizeS * scaling
                 font.weight: Style.fontWeightMedium
                 verticalAlignment: Text.AlignVCenter
-                color: Color.mOnSurface
+                horizontalAlignment: hasActivePlayer ? Text.AlignLeft : Text.AlignHCenter
+                color: hasActivePlayer ? Color.mOnSurface : Color.mOnSurfaceVariant
               }
 
               NText {
-                text: getTitle()
+                text: hasActivePlayer ? getTitle() : placeholderText
                 font: titleText.font
                 verticalAlignment: Text.AlignVCenter
-                color: Color.mOnSurface
-                visible: titleContainer.needsScrolling && titleContainer.isScrolling
+                horizontalAlignment: hasActivePlayer ? Text.AlignLeft : Text.AlignHCenter
+                color: hasActivePlayer ? Color.mOnSurface : Color.mOnSurfaceVariant
+                visible: hasActivePlayer && titleContainer.needsScrolling && titleContainer.isScrolling
               }
             }
 
@@ -336,12 +349,12 @@ Item {
           width: Style.baseWidgetSize * 0.5 * scaling
           height: Style.baseWidgetSize * 0.5 * scaling
           anchors.centerIn: parent
-          visible: getTitle() !== ""
 
           NIcon {
             id: mediaIconVertical
             anchors.fill: parent
-            icon: MediaService.isPlaying ? "media-pause" : "media-play"
+            icon: hasActivePlayer ? (MediaService.isPlaying ? "media-pause" : "media-play") : "disc"
+            color: hasActivePlayer ? Color.mOnSurface : Color.mOnSurfaceVariant
             pointSize: Style.fontSizeL * scaling
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
@@ -354,10 +367,10 @@ Item {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+        cursorShape: hasActivePlayer ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onClicked: mouse => {
-                     if (!MediaService.currentPlayer || !MediaService.canPlay) {
+                     if (!hasActivePlayer || !MediaService.currentPlayer || !MediaService.canPlay) {
                        return
                      }
 
@@ -365,18 +378,17 @@ Item {
                        MediaService.playPause()
                      } else if (mouse.button == Qt.RightButton) {
                        MediaService.next()
-                       // Need to hide the tooltip instantly
-                       tooltip.visible = false
+                       TooltipService.hide()
                      } else if (mouse.button == Qt.MiddleButton) {
                        MediaService.previous()
-                       // Need to hide the tooltip instantly
-                       tooltip.visible = false
+                       TooltipService.hide()
                      }
                    }
 
         onEntered: {
-          if ((tooltipText !== "") && (barPosition === "left" || barPosition === "right") || (scrollingMode === "never")) {
-            TooltipService.show(root, tooltipText, BarService.getTooltipDirection())
+          var textToShow = hasActivePlayer ? tooltipText : placeholderText
+          if ((textToShow !== "") && (barPosition === "left" || barPosition === "right") || (scrollingMode === "never")) {
+            TooltipService.show(Screen, root, textToShow, BarService.getTooltipDirection())
           }
         }
         onExited: {

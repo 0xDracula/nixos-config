@@ -7,7 +7,6 @@ import qs.Widgets
 NIconButton {
   id: root
 
-  property ShellScreen screen
   property real scaling: 1.0
 
   icon: "camera-video"
@@ -19,5 +18,14 @@ NIconButton {
   colorFg: ScreenRecorderService.isRecording ? Color.mOnPrimary : Color.mOnSurface
   colorBorder: Color.transparent
   colorBorderHover: Color.transparent
-  onClicked: ScreenRecorderService.toggleRecording()
+
+  function handleClick() {
+    if (!ScreenRecorderService.isAvailable) {
+      ToastService.showError(I18n.tr("toast.recording.not-installed"), I18n.tr("toast.recording.not-installed-desc"), 7000)
+      return
+    }
+    ScreenRecorderService.toggleRecording()
+  }
+
+  onClicked: handleClick()
 }

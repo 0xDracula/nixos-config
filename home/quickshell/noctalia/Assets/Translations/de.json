@@ -2,7 +2,6 @@
   "settings": {
     "general": {
       "title": "Allgemein",
-      
       "profile": {
         "section": {
           "label": "Profil",
@@ -14,11 +13,14 @@
         },
         "select-avatar": "Avatar-Bild auswählen"
       },
-
       "ui": {
         "section": {
           "label": "Benutzeroberfläche",
           "description": "Passen Sie das Aussehen, die Haptik und das Verhalten der Oberfläche an."
+        },
+        "tooltips": {
+          "label": "Tooltips anzeigen",
+          "description": "Tooltips in der gesamten Benutzeroberfläche aktivieren oder deaktivieren."
         },
         "dim-desktop": {
           "label": "Desktop abdunkeln",
@@ -64,13 +66,32 @@
           "label": "Standard-Schriftart",
           "description": "Hauptschriftart für die gesamte Benutzeroberfläche.",
           "placeholder": "Standard-Schriftart auswählen...",
-          "search-placeholder": "Schriftarten suchen..."
+          "search-placeholder": "Schriftarten suchen...",
+          "scale": {
+            "description": "Vergrößern oder verkleinern Sie die Größe des Standardtextes.",
+            "label": "Standardmäßige Schriftgröße"
+          }
         },
         "monospace": {
           "label": "Monospace-Schriftart",
           "description": "Monospace-Schriftart für Zahlen und Statistik-Anzeigen.",
           "placeholder": "Monospace-Schriftart auswählen...",
-          "search-placeholder": "Monospace-Schriftarten suchen..."
+          "search-placeholder": "Monospace-Schriftarten suchen...",
+          "scale": {
+            "description": "Die Größe des nichtproportionalen Textes vergrößern oder verkleinern.",
+            "label": "Schriftgröße mit fester Breite"
+          }
+        },
+        "reset-scaling": "Skalierung zurücksetzen"
+      },
+      "control-center": {
+        "section": {
+          "label": "Kontrollzentrum",
+          "description": "Konfigurieren Sie die Positionierung und das Verhalten des Kontrollzentrum-Panels."
+        },
+        "position": {
+          "label": "Position",
+          "description": "Wählen Sie, wo das Kontrollzentrum-Panel beim Öffnen erscheint."
         }
       }
     },
@@ -245,6 +266,10 @@
         "section": {
           "label": "Monitor-Anzeige",
           "description": "Statusleiste auf bestimmten Monitoren anzeigen. Standard ist alle, wenn keine ausgewählt sind."
+        },
+        "only-same-output": {
+          "label": "Nur Apps vom gleichen Bildschirm",
+          "description": "Zeige nur Apps vom dem Bildschirm an, wo sich das Dock befindet."
         }
       }
     },
@@ -255,13 +280,12 @@
           "label": "Erscheinungsbild",
           "description": "Verhalten und Erscheinungsbild des Docks anpassen."
         },
-        "auto-hide": {
-          "label": "Automatisch ausblenden",
-          "description": "Automatisch ausblenden, wenn nicht in Gebrauch."
-        },
-        "exclusive-zone": {
-          "label": "Exklusive Zone",
-          "description": "Fensterüberlappung verhindern."
+        "display": {
+          "label": "Anzeige",
+          "description": "Wählen Sie, wie sich das Dock verhält.",
+          "always-visible": "Immer sichtbar",
+          "auto-hide": "Automatisch ausblenden",
+          "exclusive": "Exklusiv"
         },
         "background-opacity": {
           "label": "Hintergrund-Transparenz",
@@ -276,6 +300,10 @@
         "section": {
           "label": "Monitor-Anzeige",
           "description": "Monitor auswählen, auf dem das Dock angezeigt werden soll."
+        },
+        "only-same-output": {
+          "description": "Zeige nur Apps aus der Ausgabe an, bei denen sich das Dock befindet.",
+          "label": "Nur Apps von derselben Ausgabe"
         }
       }
     },
@@ -305,6 +333,10 @@
         "use-app2unit": {
           "label": "App2Unit zum Starten von Anwendungen verwenden",
           "description": "Verwendet eine alternative Startmethode zur besseren Verwaltung von App-Prozessen und Problemvermeidung."
+        },
+        "terminal-command": {
+          "label": "Terminalbefehl",
+          "description": "Befehl zum Starten eines Terminals. Z.B. 'kitty -e' oder 'gnome-terminal --'."
         }
       }
     },
@@ -473,9 +505,9 @@
           "label": "Dunkler Modus",
           "description": "Wechselt zu einem dunkleren Theme für einfachere Betrachtung bei Nacht."
         },
-        "enable-matugen": {
-          "label": "Matugen aktivieren",
-          "description": "Automatisch Farben basierend auf Ihrem aktiven Hintergrundbild generieren."
+        "use-wallpaper-colors": {
+          "label": "Hintergrundbild-Farben verwenden",
+          "description": "Farbschemata aus Ihrem Hintergrundbild mit Matugen generieren. Extrahiert automatisch Farben für ein kohärentes Design."
         },
         "matugen-scheme-type": {
           "label": "Matugen-Schema-Typ",
@@ -486,26 +518,20 @@
         "section": {
           "label": "Vordefinierte Farbschemata",
           "description": "Wählen Sie aus einer Sammlung vordefinierter Farbschemata."
+        },
+        "generate-templates": {
+          "label": "Templates für vordefinierte Schemata generieren",
+          "description": "Generiert Matugen-Templates (GTK, Terminal-Themes, etc.) bei der Verwendung vordefinierter Farbschemata."
         }
       },
-      "matugen": {
-        "section": {
-          "label": "Matugen-Vorlagen",
-          "description": "Farben auf externe Anwendungen anwenden."
-        },
+      "templates": {
         "ui": {
           "label": "UI",
           "description": "Desktop-Umgebung und UI-Toolkit-Theming.",
-          "gtk4": {
+          "gtk": {
             "description": "Schreibt {filepath}"
           },
-          "gtk3": {
-            "description": "Schreibt {filepath}"
-          },
-          "qt6": {
-            "description": "Schreibt {filepath}"
-          },
-          "qt5": {
+          "qt": {
             "description": "Schreibt {filepath}"
           }
         },
@@ -548,6 +574,10 @@
             "label": "Benutzer-Vorlagen",
             "description": "Benutzerdefinierte Matugen-Konfiguration aus ~/.config/matugen/config.toml aktivieren"
           }
+        },
+        "section": {
+          "description": "Farben auf externe Anwendungen anwenden.",
+          "label": "Vorlagen"
         }
       }
     },
@@ -580,8 +610,8 @@
           "description": "Anpassen, wie Datum und Zeit erscheinen."
         },
         "12hour-format": {
-          "label": "12-Stunden-Zeitformat auf dem Sperrbildschirm verwenden",
-          "description": "An für AM/PM-Format (z.B. 8:00 PM), aus für 24-Stunden-Format (z.B. 20:00)."
+          "description": "An für AM/PM-Format (z.B. 8:00 PM), aus für 24-Stunden-Format (z.B. 20:00).",
+          "label": "Benutze das 12-Stunden-Zeitformat"
         },
         "week-numbers": {
           "label": "Wochennummern anzeigen",
@@ -838,6 +868,10 @@
         "scrolling-mode": {
           "label": "Scrollmodus",
           "description": "Steuern, wann Textscrolling für lange Fenstertitel aktiviert ist."
+        },
+        "width": {
+          "description": "Steuert die horizontale Größe des Widgets.",
+          "label": "Widget-Breite"
         }
       },
       "system-monitor": {
@@ -987,7 +1021,8 @@
         "scrolling-mode": {
           "label": "Scrollmodus",
           "description": "Steuern, wann Textscrolling für lange Track-Titel aktiviert ist."
-        }
+        },
+        "no-active-player": "Kein aktiver Player"
       },
       "clock": {
         "use-primary-color": {
@@ -1010,7 +1045,17 @@
           "label": "Vertikale Statusleiste",
           "description": "Verwenden Sie ein Leerzeichen, um jeden Teil in eine neue Zeile zu trennen."
         },
-        "preview": "Vorschau"
+        "preview": "Vorschau",
+        "custom-font": {
+          "description": "Wähle eine benutzerdefinierte Schriftart für die Uhrenanzeige aus.",
+          "label": "Benutzerdefinierte Schriftart",
+          "placeholder": "Benutzerdefinierte Schriftart auswählen...",
+          "search-placeholder": "Schriftarten suchen..."
+        },
+        "use-custom-font": {
+          "description": "Überschreibe die Standard-Schriftauswahl mit einer benutzerdefinierten Schriftart für die Uhr.",
+          "label": "Benutzerdefinierte Schriftart verwenden"
+        }
       },
       "taskbar": {
         "only-active-workspaces": {
@@ -1028,7 +1073,8 @@
     "panel": {
       "title": "Benachrichtigungen",
       "no-notifications": "Keine Benachrichtigungen",
-      "description": "Ihre Benachrichtigungen werden hier angezeigt, sobald sie eintreffen."
+      "description": "Ihre Benachrichtigungen werden hier angezeigt, sobald sie eintreffen.",
+      "click-to-expand": "Zum Erweitern klicken"
     }
   },
   "wallpaper": {
@@ -1131,6 +1177,7 @@
     "night-light-disabled": "Nachtlicht ist deaktiviert.\\nLinksklick zum Wechseln des Modus.\\nRechtsklick für Einstellungen.",
     "night-light-enabled": "Nachtlicht ist aktiviert.\\nLinksklick zum Wechseln des Modus.\\nRechtsklick für Einstellungen.",
     "night-light-forced": "Nachtlicht ist erzwungen.\\nLinksklick zum Wechseln des Modus.\\nRechtsklick für Einstellungen.",
+    "night-light-not-installed": "Nachtlicht ist nicht verfügbar.\\nwlsunset ist nicht installiert.",
     "click-to-start-recording": "Klicken zum Starten der Aufnahme",
     "click-to-stop-recording": "Klicken zum Stoppen der Aufnahme",
     "open-control-center": "Kontrollzentrum öffnen",
@@ -1169,7 +1216,6 @@
     "enter-width-pixels": "Breite in Pixeln eingeben",
     "enter-command": "Befehl eingeben (App oder benutzerdefiniertes Skript)",
     "command-example": "echo \"Hallo Welt\"",
-    
     "search-wallpapers": "Zum Filtern von Hintergrundbildern eingeben...",
     "search-launcher": "Einträge suchen... oder > für Befehle verwenden",
     "search": "Suchen...",
@@ -1202,6 +1248,17 @@
         "top_center": "Oben mittig",
         "center_left": "Links mittig",
         "center_right": "Rechts mittig"
+      }
+    },
+    "control-center": {
+      "position": {
+        "close_to_bar_button": "Nah zur Leisten-Schaltfläche",
+        "top_left": "Oben links",
+        "top_right": "Oben rechts",
+        "bottom_left": "Unten links",
+        "bottom_right": "Unten rechts",
+        "bottom_center": "Unten mittig",
+        "top_center": "Oben mittig"
       }
     },
     "osd": {
@@ -1241,7 +1298,6 @@
     "frame-rates": {
       "fps": "{fps} FPS"
     },
-    
     "screen-recording": {
       "sources": {
         "portal": "Portal",
@@ -1276,7 +1332,10 @@
     "reboot": "Neu starten",
     "logout": "Abmelden",
     "logout-subtitle": "Sitzung beenden",
-    "shutdown": "Herunterfahren"
+    "shutdown": "Herunterfahren",
+    "reboot-subtitle": "Starten Sie Ihren Computer neu.",
+    "shutdown-subtitle": "Schalte deinen Computer aus.",
+    "suspend-subtitle": "System in den Ruhezustand versetzen"
   },
   "plugins": {
     "applications": "Anwendungen",
@@ -1297,7 +1356,7 @@
   },
   "system": {
     "uptime": "System-Laufzeit: {uptime}",
-    "welcome-back": "Willkommen zurück, {user}!",
+    "welcome-back": "Willkommen zurück,",
     "monitor-description": "{model} ({width}x{height})",
     "scaling-percentage": "{percentage}%",
     "location-display": "{name} ({coordinates})",
@@ -1324,9 +1383,10 @@
     "error": "Authentifizierungsfehler"
   },
   "lock-screen": {
-    "secure-terminal": "SICHERES TERMINAL",
-    "unlock-command": "sudo unlock-session",
-    "password": "Passwort:",
+    "password": "Passwort eingeben...",
+    "welcome-back": "Willkommen zurück,",
+    "authenticating": "Authentifizierung...",
+    "authentication-failed": "Authentifizierung fehlgeschlagen",
     "shut-down": "Herunterfahren",
     "restart": "Neu starten",
     "suspend": "Ruhezustand"
@@ -1343,10 +1403,10 @@
       "enabled": "Aktiviert",
       "disabled": "Deaktiviert"
     },
-    "matugen": {
-      "enabled": "Aktiviert",
-      "disabled": "Deaktiviert",
-      "not-installed": "Nicht installiert"
+    "wallpaper-colors": {
+      "enabled": "Hintergrundbild-Farben aktiviert",
+      "disabled": "Hintergrundbild-Farben deaktiviert",
+      "not-installed": "Matugen nicht installiert - erforderlich für Hintergrundbild-Farbextraktion"
     },
     "recording": {
       "stopping": "Aufnahme wird gestoppt…",
@@ -1356,7 +1416,9 @@
       "failed-gpu": "gpu-screen-recorder unerwartet beendet.",
       "failed-general": "Der Rekorder wurde mit einem Fehler beendet.",
       "no-portals": "Desktop-Portale laufen nicht",
-      "no-portals-desc": "Starten Sie xdg-desktop-portal und ein Compositor-Portal (wlr/hyprland/gnome/kde)."
+      "no-portals-desc": "Starten Sie xdg-desktop-portal und ein Compositor-Portal (wlr/hyprland/gnome/kde).",
+      "not-installed": "gpu-screen-recorder nicht installiert",
+      "not-installed-desc": "Bitte installieren Sie gpu-screen-recorder, um Bildschirmaufnahme-Funktionen zu nutzen."
     },
     "clipboard": {
       "unavailable": "Zwischenablage-Verlauf nicht verfügbar",
@@ -1396,7 +1458,7 @@
     },
     "missing-control-center": {
       "label": "Letztes Control-Center-Widget entfernt",
-      "description": "Das Control-Center-Widget wurde aus der Leiste entfernt. Um es erneut über die Leiste zu öffnen, fügen Sie das Widget wieder hinzu."
+      "description": "Das Control-Center-Widget wurde aus der Leiste entfernt. Um es erneut über die Leiste zu öffnen, fügen Sie das Widget wieder hinzu. Sie können es auch durch Rechtsklick auf die Leiste öffnen."
     }
   }
 }

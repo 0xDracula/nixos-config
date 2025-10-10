@@ -18,6 +18,10 @@
           "label": "用户界面",
           "description": "自定义界面的外观、风格和行为。"
         },
+        "tooltips": {
+          "label": "显示工具提示",
+          "description": "在整个界面中启用或禁用工具提示。"
+        },
         "dim-desktop": {
           "label": "调暗桌面",
           "description": "当面板或菜单打开时调暗桌面。"
@@ -78,6 +82,16 @@
             "label": "默认等宽字体大小",
             "description": "增大或减小等宽文本的尺寸"
           }
+        }
+      },
+      "control-center": {
+        "section": {
+          "label": "控制中心",
+          "description": "配置控制中心面板的定位和行为。"
+        },
+        "position": {
+          "label": "位置",
+          "description": "选择控制中心面板打开时出现的位置。"
         }
       }
     },
@@ -262,13 +276,12 @@
           "label": "外观",
           "description": "自定义 Dock 的行为和外观。"
         },
-        "auto-hide": {
-          "label": "自动隐藏",
-          "description": "不使用时自动隐藏。"
-        },
-        "exclusive-zone": {
-          "label": "独占区域",
-          "description": "可以防止窗口重叠。"
+        "display": {
+          "label": "显示",
+          "description": "选择 Dock 的行为方式。",
+          "always-visible": "始终可见",
+          "auto-hide": "自动隐藏",
+          "exclusive": "独占"
         },
         "background-opacity": {
           "label": "背景不透明度",
@@ -283,6 +296,10 @@
         "section": {
           "label": "显示器显示",
           "description": "选择在哪个显示器上显示 Dock。"
+        },
+        "only-same-output": {
+          "description": "仅显示输出结果中dock所在位置的应用。",
+          "label": "仅来自相同输出的应用"
         }
       }
     },
@@ -312,6 +329,10 @@
         "use-app2unit": {
           "label": "使用 App2Unit 启动应用程序",
           "description": "使用替代启动方法以更好地管理应用程序进程并防止问题。"
+        },
+        "terminal-command": {
+          "description": "启动终端的命令。例如，“kitty -e”或“gnome-terminal --”。",
+          "label": "终端命令"
         }
       }
     },
@@ -480,9 +501,9 @@
           "label": "深色模式",
           "description": "切换到更暗的主题，便于夜间观看。"
         },
-        "enable-matugen": {
-          "label": "启用 Matugen",
-          "description": "根据您的活动壁纸自动生成颜色。"
+        "use-wallpaper-colors": {
+          "label": "使用壁纸颜色",
+          "description": "使用 Matugen 从壁纸生成颜色方案。自动提取颜色以创建一致的主题。"
         },
         "matugen-scheme-type": {
           "label": "Matugen 配色方案类型",
@@ -493,26 +514,20 @@
         "section": {
           "label": "预定义配色方案",
           "description": "从预定义配色方案集合中选择。"
+        },
+        "generate-templates": {
+          "label": "为预定义方案生成模板",
+          "description": "使用预定义配色方案时生成 Matugen 模板（GTK、终端主题等）。"
         }
       },
-      "matugen": {
-        "section": {
-          "label": "Matugen 模板",
-          "description": "将颜色应用于外部应用程序。"
-        },
+      "templates": {
         "ui": {
           "label": "用户界面",
           "description": "桌面环境和 UI 工具包主题。",
-          "gtk4": {
+          "gtk": {
             "description": "写入 {filepath}"
           },
-          "gtk3": {
-            "description": "写入 {filepath}"
-          },
-          "qt6": {
-            "description": "写入 {filepath}"
-          },
-          "qt5": {
+          "qt": {
             "description": "写入 {filepath}"
           }
         },
@@ -555,6 +570,10 @@
             "label": "用户模板",
             "description": "启用来自 ~/.config/matugen/config.toml 的用户定义 Matugen 配置"
           }
+        },
+        "section": {
+          "description": "将颜色应用于外部应用程序。",
+          "label": "模板"
         }
       }
     },
@@ -587,8 +606,8 @@
           "description": "自定义日期和时间的显示方式。"
         },
         "12hour-format": {
-          "label": "在锁屏上使用 12 小时制",
-          "description": "开启为 AM/PM 格式（例如：8:00 PM），关闭为 24 小时制（例如：20:00）。"
+          "description": "开启为 AM/PM 格式（例如：8:00 PM），关闭为 24 小时制（例如：20:00）。",
+          "label": "使用12小时制时间格式"
         },
         "week-numbers": {
           "label": "显示周数",
@@ -828,6 +847,10 @@
         "scrolling-mode": {
           "label": "滚动模式",
           "description": "控制何时为长窗口标题启用文本滚动。"
+        },
+        "width": {
+          "description": "控制小部件的水平尺寸。",
+          "label": "小部件宽度"
         }
       },
       "system-monitor": {
@@ -977,7 +1000,8 @@
         "scrolling-mode": {
           "label": "滚动模式",
           "description": "控制何时为长曲目标题启用文本滚动。"
-        }
+        },
+        "no-active-player": "无活动播放器"
       },
       "clock": {
         "use-primary-color": {
@@ -1000,16 +1024,26 @@
           "label": "垂直栏",
           "description": "使用空格将每个部分分隔到新行。"
         },
-        "preview": "预览"
+        "preview": "预览",
+        "custom-font": {
+          "description": "选择时钟显示使用的自定义字体。",
+          "label": "自定义字体",
+          "placeholder": "选择自定义字体...",
+          "search-placeholder": "搜索字体..."
+        },
+        "use-custom-font": {
+          "description": "使用自定义字体覆盖时钟的默认字体选择。",
+          "label": "使用自定义字体"
+        }
       },
       "taskbar": {
         "only-active-workspaces": {
-            "label": "仅显示活动工作区",
-            "description": "仅显示来自活动工作区的应用程序"
+          "label": "仅显示活动工作区",
+          "description": "仅显示来自活动工作区的应用程序"
         },
         "only-same-output": {
-            "label": "仅显示同屏幕",
-            "description": "仅显示任务栏所在屏幕上的应用程序"
+          "label": "仅显示同屏幕",
+          "description": "仅显示任务栏所在屏幕上的应用程序"
         }
       }
     }
@@ -1018,7 +1052,8 @@
     "panel": {
       "title": "通知",
       "no-notifications": "无通知",
-      "description": "您的通知将在到达时显示在此处。"
+      "description": "您的通知将在到达时显示在此处。",
+      "click-to-expand": "点击展开"
     }
   },
   "wallpaper": {
@@ -1121,6 +1156,7 @@
     "night-light-disabled": "夜间模式已禁用。\n左键点击循环模式。\n右键点击访问设置。",
     "night-light-enabled": "夜间模式已启用。\n左键点击循环模式。\n右键点击访问设置。",
     "night-light-forced": "夜间模式已强制启用。\n左键点击循环模式。\n右键点击访问设置。",
+    "night-light-not-installed": "夜间模式不可用。\nwlsunset 未安装。",
     "click-to-start-recording": "点击开始录制",
     "click-to-stop-recording": "点击停止录制",
     "open-control-center": "打开控制中心",
@@ -1191,6 +1227,17 @@
         "top_center": "顶部居中",
         "center_left": "左侧居中",
         "center_right": "右侧居中"
+      }
+    },
+    "control-center": {
+      "position": {
+        "close_to_bar_button": "靠近栏按钮",
+        "top_left": "左上角",
+        "top_right": "右上角",
+        "bottom_left": "左下角",
+        "bottom_right": "右下角",
+        "bottom_center": "底部居中",
+        "top_center": "顶部居中"
       }
     },
     "osd": {
@@ -1288,7 +1335,7 @@
   },
   "system": {
     "uptime": "系统运行时间：{uptime}",
-    "welcome-back": "欢迎回来，{user}！",
+    "welcome-back": "欢迎回来，",
     "monitor-description": "{model} ({width}x{height})",
     "scaling-percentage": "{percentage}%",
     "location-display": "{name} ({coordinates})",
@@ -1304,9 +1351,10 @@
     "unknown-layout": "未知"
   },
   "lock-screen": {
-    "secure-terminal": "安全终端",
-    "unlock-command": "sudo unlock-session",
-    "password": "密码：",
+    "password": "请输入密码...",
+    "welcome-back": "欢迎回来，",
+    "authenticating": "正在验证...",
+    "authentication-failed": "验证失败",
     "shut-down": "关机",
     "restart": "重启",
     "suspend": "挂起"
@@ -1323,10 +1371,10 @@
       "enabled": "已启用",
       "disabled": "已禁用"
     },
-    "matugen": {
-      "enabled": "已启用",
-      "disabled": "已禁用",
-      "not-installed": "未安装"
+    "wallpaper-colors": {
+      "enabled": "壁纸颜色已启用",
+      "disabled": "壁纸颜色已禁用",
+      "not-installed": "Matugen 未安装 - 壁纸颜色提取所需"
     },
     "recording": {
       "stopping": "正在停止录制…",
@@ -1336,7 +1384,9 @@
       "failed-gpu": "gpu-screen-recorder 意外退出。",
       "failed-general": "录制器因错误退出。",
       "no-portals": "桌面门户未运行",
-      "no-portals-desc": "请启动 xdg-desktop-portal 和一个合成器门户 (wlr/hyprland/gnome/kde)。"
+      "no-portals-desc": "请启动 xdg-desktop-portal 和一个合成器门户 (wlr/hyprland/gnome/kde)。",
+      "not-installed": "gpu-screen-recorder 未安装",
+      "not-installed-desc": "请安装 gpu-screen-recorder 以使用屏幕录制功能。"
     },
     "clipboard": {
       "unavailable": "剪贴板历史记录不可用",
@@ -1376,7 +1426,7 @@
     },
     "missing-control-center": {
       "label": "最后一个控制中心小部件已移除",
-      "description": "控制中心小部件已从状态栏中移除。要再次从状态栏访问它，您需要重新添加小部件。"
+      "description": "控制中心小部件已从状态栏中移除。要再次从状态栏访问它，您需要重新添加小部件。您也可以通过右键点击状态栏来打开它。"
     }
   },
   "weather": {

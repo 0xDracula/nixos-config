@@ -16,6 +16,10 @@ NPanel {
   preferredHeight: 480
   panelKeyboardFocus: true
 
+  onOpened: function () {
+    Settings.data.notifications.lastSeenTs = Time.timestamp * 1000
+  }
+
   panelContent: Rectangle {
     id: notificationRect
     color: Color.transparent
@@ -129,8 +133,12 @@ NPanel {
         boundsBehavior: Flickable.StopAtBounds
         visible: NotificationService.historyList.count > 0
 
+        // Track which notification is expanded
+        property string expandedId: ""
+
         delegate: Rectangle {
           property string notificationId: model.id
+          property bool isExpanded: notificationList.expandedId === notificationId
 
           width: notificationList.width
           height: notificationLayout.implicitHeight + (Style.marginM * scaling * 2)
@@ -139,11 +147,34 @@ NPanel {
           border.color: Qt.alpha(Color.mOutline, Style.opacityMedium)
           border.width: Math.max(1, Style.borderS * scaling)
 
+          Behavior on height {
+            NumberAnimation {
+              duration: Style.animationNormal
+              easing.type: Easing.InOutQuad
+            }
+          }
+
           // Smooth color transition on hover
           Behavior on color {
             ColorAnimation {
               duration: Style.animationFast
             }
+          }
+
+          // Click to expand/collapse
+          MouseArea {
+            anchors.fill: parent
+            // Don't capture clicks on the delete button
+            anchors.rightMargin: 48 * scaling
+            enabled: (summaryText.truncated || bodyText.truncated)
+            onClicked: {
+              if (notificationList.expandedId === notificationId) {
+                notificationList.expandedId = ""
+              } else {
+                notificationList.expandedId = notificationId
+              }
+            }
+            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
           }
 
           RowLayout {
@@ -174,6 +205,7 @@ NPanel {
               Layout.fillWidth: true
               Layout.alignment: Qt.AlignTop
               spacing: Style.marginXS * scaling
+              Layout.rightMargin: -(Style.marginM + Style.baseWidgetSize * 0.6) * scaling
 
               // Header row with app name and timestamp
               RowLayout {
@@ -216,6 +248,7 @@ NPanel {
 
               // Summary
               NText {
+                id: summaryText
                 text: model.summary || I18n.tr("general.no-summary")
                 pointSize: Style.fontSizeM * scaling
                 font.weight: Font.Medium
@@ -223,21 +256,52 @@ NPanel {
                 textFormat: Text.PlainText
                 wrapMode: Text.Wrap
                 Layout.fillWidth: true
-                maximumLineCount: 2
+                maximumLineCount: isExpanded ? 999 : 2
                 elide: Text.ElideRight
               }
 
               // Body
               NText {
+                id: bodyText
                 text: model.body || ""
                 pointSize: Style.fontSizeS * scaling
                 color: Color.mOnSurfaceVariant
                 textFormat: Text.PlainText
                 wrapMode: Text.Wrap
                 Layout.fillWidth: true
-                maximumLineCount: 3
+                maximumLineCount: isExpanded ? 999 : 3
                 elide: Text.ElideRight
                 visible: text.length > 0
+              }
+
+              // Spacer for expand indicator
+              Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: (!isExpanded && (summaryText.truncated || bodyText.truncated)) ? (Style.marginS * scaling) : 0
+              }
+
+              // Expand indicator
+              RowLayout {
+                Layout.fillWidth: true
+                visible: !isExpanded && (summaryText.truncated || bodyText.truncated)
+                spacing: Style.marginXS * scaling
+
+                Item {
+                  Layout.fillWidth: true
+                }
+
+                NText {
+                  text: I18n.tr("notifications.panel.click-to-expand") || "Click to expand"
+                  pointSize: Style.fontSizeXS * scaling
+                  color: Color.mPrimary
+                  font.weight: Font.Medium
+                }
+
+                NIcon {
+                  icon: "chevron-down"
+                  pointSize: Style.fontSizeS * scaling
+                  color: Color.mPrimary
+                }
               }
             }
 

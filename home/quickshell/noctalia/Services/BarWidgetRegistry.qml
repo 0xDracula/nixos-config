@@ -41,8 +41,9 @@ Singleton {
                                   "ActiveWindow": {
                                     "allowUserSettings": true,
                                     "showIcon": true,
-                                    "autoHide": true,
-                                    "scrollingMode": "hover"
+                                    "autoHide": false,
+                                    "scrollingMode": "hover",
+                                    "width": 145
                                   },
                                   "Battery": {
                                     "allowUserSettings": true,
@@ -56,7 +57,8 @@ Singleton {
                                   "Clock": {
                                     "allowUserSettings": true,
                                     "usePrimaryColor": true,
-                                    "useMonospacedFont": true,
+                                    "useCustomFont": false,
+                                    "customFont": "",
                                     "formatHorizontal": "HH:mm ddd, MMM dd",
                                     "formatVertical": "HH mm - dd MM"
                                   },
@@ -81,7 +83,7 @@ Singleton {
                                   },
                                   "MediaMini": {
                                     "allowUserSettings": true,
-                                    "autoHide": true,
+                                    "autoHide": false,
                                     "scrollingMode": "hover",
                                     "showAlbumArt": false,
                                     "showVisualizer": false,

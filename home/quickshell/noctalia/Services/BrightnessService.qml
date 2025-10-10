@@ -16,6 +16,9 @@ Singleton {
     return monitors.find(m => m.modelData === screen)
   }
 
+  // Signal emitted when a specific monitor's brightness changes, includes monitor context
+  signal monitorBrightnessChanged(var monitor, real newBrightness)
+
   function getAvailableMethods(): list<string> {
     var methods = []
     if (monitors.some(m => m.isDdc))
@@ -73,15 +76,13 @@ Singleton {
     command: ["ddcutil", "detect", "--sleep-multiplier=0.5"]
     stdout: StdioCollector {
       onStreamFinished: {
-        // Do not filter out invalid displays. For some reason --brief returns some invalid which works fine
         var displays = text.trim().split("\n\n")
-
         ddcProc.ddcMonitors = displays.map(d => {
 
-                                             var ddcModelMatc = d.match(/This monitor does not support DDC\/CI/)
+                                             var ddcModelMatch = d.match(/(This monitor does not support DDC\/CI|Invalid display)/)
                                              var modelMatch = d.match(/Model:\s*(.*)/)
                                              var busMatch = d.match(/I2C bus:[ ]*\/dev\/i2c-([0-9]+)/)
-                                             var ddcModel = ddcModelMatc ? ddcModelMatc.length > 0 : false
+                                             var ddcModel = ddcModelMatch ? ddcModelMatch.length > 0 : false
                                              var model = modelMatch ? modelMatch[1] : "Unknown"
                                              var bus = busMatch ? busMatch[1] : "Unknown"
                                              Logger.log("Brigthness", "Detected DDC Monitor:", model, "on bus", bus, "is DDC:", !ddcModel)
@@ -119,6 +120,52 @@ Singleton {
     // Signal for brightness changes
     signal brightnessUpdated(real newBrightness)
 
+    // Execute a system command to get the current brightness value directly
+    readonly property Process refreshProc: Process {
+      stdout: StdioCollector {
+        onStreamFinished: {
+          var dataText = text.trim()
+          if (dataText === "") {
+            return
+          }
+
+          var lines = dataText.split("\n")
+          if (lines.length >= 2) {
+            var current = parseInt(lines[0].trim())
+            var max = parseInt(lines[1].trim())
+            if (!isNaN(current) && !isNaN(max) && max > 0) {
+              var newBrightness = current / max
+              // Only update if it's actually different (avoid feedback loops)
+              if (Math.abs(newBrightness - monitor.brightness) > 0.01) {
+                // Update internal value to match system state
+                monitor.brightness = newBrightness
+                monitor.brightnessUpdated(monitor.brightness)
+                root.monitorBrightnessChanged(monitor, monitor.brightness)
+                //Logger.log("Brightness", "Refreshed brightness from system:", monitor.modelData.name, monitor.brightness)
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Function to actively refresh the brightness from system
+    function refreshBrightnessFromSystem() {
+      if (!monitor.isDdc && !monitor.isAppleDisplay) {
+        // For internal displays, query the system directly
+        refreshProc.command = ["sh", "-c", "cat " + monitor.brightnessPath + " && " + "cat " + monitor.maxBrightnessPath]
+        refreshProc.running = true
+      } else if (monitor.isDdc) {
+        // For DDC displays, get the current value
+        refreshProc.command = ["ddcutil", "-b", monitor.busNum, "getvcp", "10", "--brief"]
+        refreshProc.running = true
+      } else if (monitor.isAppleDisplay) {
+        // For Apple displays, get the current value
+        refreshProc.command = ["asdbctl", "get"]
+        refreshProc.running = true
+      }
+    }
+
     // FileView to watch for external brightness changes (internal displays only)
     readonly property FileView brightnessWatcher: FileView {
       id: brightnessWatcher
@@ -126,23 +173,11 @@ Singleton {
       path: (!monitor.isDdc && !monitor.isAppleDisplay && monitor.brightnessPath !== "") ? monitor.brightnessPath : ""
       watchChanges: path !== ""
       onFileChanged: {
-        reload()
-        if (monitor.ignoreNextChange) {
-          monitor.ignoreNextChange = false
-          return
-        }
-        if (text() === "")
-        return
-        var current = parseInt(text().trim())
-        if (!isNaN(current) && monitor.maxBrightness > 0) {
-          var newBrightness = current / monitor.maxBrightness
-          // Only update if it's actually different (avoid feedback loops)
-          if (Math.abs(newBrightness - monitor.brightness) > 0.01) {
-            monitor.brightness = newBrightness
-            monitor.brightnessUpdated(monitor.brightness)
-            //Logger.log("Brightness", "External change detected:", monitor.modelData.name, monitor.brightness)
-          }
-        }
+        // When a file change is detected, actively refresh from system
+        // to ensure we get the most up-to-date value
+        Qt.callLater(() => {
+                       monitor.refreshBrightnessFromSystem()
+                     })
       }
     }
 
@@ -193,6 +228,7 @@ Singleton {
 
           // Always update
           monitor.brightnessUpdated(monitor.brightness)
+          root.monitorBrightnessChanged(monitor, monitor.brightness)
         }
       }
     }
@@ -229,20 +265,21 @@ Singleton {
       value = Math.max(0, Math.min(1, value))
       var rounded = Math.round(value * 100)
 
-      if (Math.round(monitor.brightness * 100) === rounded)
-        return
-
       if (timer.running) {
         monitor.queuedBrightness = value
         return
       }
 
+      // Update internal value and trigger UI feedback
       monitor.brightness = value
-      brightnessUpdated(monitor.brightness)
+      monitor.brightnessUpdated(value)
+      root.monitorBrightnessChanged(monitor, monitor.brightness)
 
       if (isAppleDisplay) {
+        monitor.ignoreNextChange = true
         Quickshell.execDetached(["asdbctl", "set", rounded])
       } else if (isDdc) {
+        monitor.ignoreNextChange = true
         Quickshell.execDetached(["ddcutil", "-b", busNum, "setvcp", "10", rounded])
       } else {
         monitor.ignoreNextChange = true

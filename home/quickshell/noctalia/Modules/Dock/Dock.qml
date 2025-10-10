@@ -17,7 +17,7 @@ Variants {
 
     required property ShellScreen modelData
     property real scaling: ScalingService.getScreenScale(modelData)
-    property bool barIsReady: BarService.isBarReady(modelData.name)
+    property bool barIsReady: modelData ? BarService.isBarReady(modelData.name) : false
 
     Connections {
       target: BarService
@@ -51,6 +51,9 @@ Variants {
       function onPinnedAppsChanged() {
         updateDockApps()
       }
+      function onOnlySameOutputChanged() {
+        updateDockApps()
+      }
     }
 
     // Initial update when component is ready
@@ -61,7 +64,9 @@ Variants {
     }
 
     // Shared properties between peek and dock windows
-    readonly property bool autoHide: Settings.data.dock.autoHide
+    readonly property string displayMode: Settings.data.dock.displayMode
+    readonly property bool autoHide: displayMode === "auto_hide"
+    readonly property bool exclusive: displayMode === "exclusive"
     readonly property int hideDelay: 500
     readonly property int showDelay: 100
     readonly property int hideAnimationDuration: Style.animationFast
@@ -71,7 +76,7 @@ Variants {
     readonly property int floatingMargin: Settings.data.dock.floatingRatio * Style.marginL * scaling
 
     // Bar detection and positioning properties
-    readonly property bool hasBar: modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
+    readonly property bool hasBar: modelData && modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
     readonly property bool barAtBottom: hasBar && Settings.data.bar.position === "bottom"
     readonly property int barHeight: Style.barHeight * scaling
 
@@ -108,7 +113,7 @@ Variants {
       // Strategy: Maintain app positions as much as possible
       // 1. First pass: Add all running apps (both pinned and non-pinned) in their current order
       runningApps.forEach(toplevel => {
-                            if (toplevel && toplevel.appId) {
+                            if (toplevel && toplevel.appId && !(Settings.data.dock.onlySameOutput && toplevel.screens && !toplevel.screens.includes(modelData))) {
                               const isPinned = pinnedApps.includes(toplevel.appId)
                               const appType = isPinned ? "pinned-running" : "running"
 
@@ -190,7 +195,7 @@ Variants {
 
     // PEEK WINDOW - Always visible when auto-hide is enabled
     Loader {
-      active: barIsReady && modelData && Settings.data.dock.monitors.includes(modelData.name) && autoHide
+      active: (barIsReady || !hasBar) && modelData && Settings.data.dock.monitors.includes(modelData.name) && autoHide
 
       sourceComponent: PanelWindow {
         id: peekWindow
@@ -236,7 +241,7 @@ Variants {
 
     // DOCK WINDOW
     Loader {
-      active: barIsReady && modelData && Settings.data.dock.monitors.includes(modelData.name) && dockLoaded && ToplevelManager && (dockApps.length > 0)
+      active: (barIsReady || !hasBar) && modelData && Settings.data.dock.monitors.includes(modelData.name) && dockLoaded && ToplevelManager && (dockApps.length > 0)
 
       sourceComponent: PanelWindow {
         id: dockWindow
@@ -247,7 +252,7 @@ Variants {
         color: Color.transparent
 
         WlrLayershell.namespace: "noctalia-dock-main"
-        WlrLayershell.exclusionMode: Settings.data.dock.exclusive ? ExclusionMode.Auto : ExclusionMode.Ignore
+        WlrLayershell.exclusionMode: exclusive ? ExclusionMode.Auto : ExclusionMode.Ignore
 
         // Size to fit the dock container exactly
         implicitWidth: dockContainerWrapper.width
@@ -477,7 +482,7 @@ Variants {
                         anyAppHovered = true
                         const appName = appButton.appTitle || appButton.appId || "Unknown"
                         const tooltipText = appName.length > 40 ? appName.substring(0, 37) + "..." : appName
-                        TooltipService.show(appButton, tooltipText, "top")
+                        TooltipService.show(Screen, appButton, tooltipText, "top")
                         if (autoHide) {
                           showTimer.stop()
                           hideTimer.stop()

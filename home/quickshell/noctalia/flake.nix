@@ -31,7 +31,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
           qs = quickshell.packages.${system}.default.override {
             withX11 = false;
-            withI3 = false;
+            withI3 = true;
           };
 
           runtimeDeps =
@@ -266,6 +266,10 @@
               wantedBy = [ cfg.target ];
               restartTriggers = [ cfg.package ];
 
+              environment = {
+                PATH = lib.mkForce null;
+              };
+
               unitConfig = {
                 StartLimitIntervalSec = 60;
                 StartLimitBurst = 3;
@@ -278,7 +282,6 @@
                 TimeoutStartSec = 10;
                 TimeoutStopSec = 5;
                 Environment = [
-                  "PATH=${config.system.path}/bin"
                   "NOCTALIA_SETTINGS_FALLBACK=%h/.config/noctalia/gui-settings.json"
                 ];
               };

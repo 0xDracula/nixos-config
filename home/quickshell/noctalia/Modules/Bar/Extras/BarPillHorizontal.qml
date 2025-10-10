@@ -1,11 +1,14 @@
 import QtQuick
 import QtQuick.Controls
+import Quickshell
 import qs.Commons
 import qs.Services
 import qs.Widgets
 
 Item {
   id: root
+
+  property ShellScreen screen
 
   property string icon: ""
   property string text: ""
@@ -55,6 +58,7 @@ Item {
 
   Rectangle {
     id: pill
+
     width: revealed ? pillMaxWidth : 1
     height: pillHeight
 
@@ -219,7 +223,7 @@ Item {
     onEntered: {
       hovered = true
       root.entered()
-      TooltipService.show(pill, root.tooltipText, BarService.getTooltipDirection(), Style.tooltipDelayLong)
+      TooltipService.show(Screen, pill, root.tooltipText, BarService.getTooltipDirection(), Style.tooltipDelayLong)
       if (disableOpen || forceClose) {
         return
       }

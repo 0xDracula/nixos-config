@@ -17,6 +17,8 @@ Loader {
   property real preferredHeightRatio
   property color panelBackgroundColor: Color.mSurface
   property bool draggable: false
+  property var buttonItem: null
+  property string buttonName: ""
 
   property bool panelAnchorHorizontalCenter: false
   property bool panelAnchorVerticalCenter: false
@@ -42,8 +44,6 @@ Loader {
   property real scaleValue: originalScale
   property real opacityValue: originalOpacity
   property real dimmingOpacity: 0
-
-  property alias isClosing: hideTimer.running
 
   signal opened
   signal closed
@@ -74,34 +74,20 @@ Loader {
   }
 
   // -----------------------------------------
-  function toggle(buttonItem) {
-    if (!active || isClosing) {
-      open(buttonItem)
+  function toggle(buttonItem, buttonName) {
+    if (!active) {
+      open(buttonItem, buttonName)
     } else {
       close()
     }
   }
 
   // -----------------------------------------
-  function open(buttonItem) {
-    // Get the button position if provided
-    if (buttonItem !== undefined && buttonItem !== null) {
-      useButtonPosition = true
+  function open(buttonItem, buttonName) {
+    root.buttonItem = buttonItem
+    root.buttonName = buttonName || ""
 
-      var itemPos = buttonItem.mapToItem(null, 0, 0)
-      buttonPosition = Qt.point(itemPos.x, itemPos.y)
-      buttonWidth = buttonItem.width
-      buttonHeight = buttonItem.height
-    } else {
-      useButtonPosition = false
-    }
-
-    // Special case if currently closing/animating
-    if (isClosing) {
-      hideTimer.stop() // in case we were closing
-      scaleValue = 1.0
-      opacityValue = 1.0
-    }
+    setPosition()
 
     PanelService.willOpenPanel(root)
 
@@ -115,12 +101,6 @@ Loader {
     dimmingOpacity = 0
     scaleValue = originalScale
     opacityValue = originalOpacity
-    hideTimer.start()
-    PanelService.willClosePanel(root)
-  }
-
-  // -----------------------------------------
-  function closeCompleted() {
     root.closed()
     active = false
     useButtonPosition = false
@@ -129,13 +109,23 @@ Loader {
   }
 
   // -----------------------------------------
-  // Timer to disable the loader after the close animation is completed
-  Timer {
-    id: hideTimer
-    interval: Style.animationSlow
-    repeat: false
-    onTriggered: {
-      closeCompleted()
+  function setPosition() {
+    // If we have a button name, we are landing here from an IPC call.
+    // IPC calls have no idead on which screen they panel will spawn.
+    // Resolve the button name to a proper button item now that we have a screen.
+    if (buttonName !== "" && root.screen !== null) {
+      buttonItem = BarService.lookupWidget(buttonName, root.screen.name)
+    }
+
+    // Get the button position if provided
+    if (buttonItem !== undefined && buttonItem !== null) {
+      useButtonPosition = true
+      var itemPos = buttonItem.mapToItem(null, 0, 0)
+      buttonPosition = Qt.point(itemPos.x, itemPos.y)
+      buttonWidth = buttonItem.width
+      buttonHeight = buttonItem.height
+    } else {
+      useButtonPosition = false
     }
   }
 
@@ -175,6 +165,12 @@ Loader {
           // It's mandatory to force refresh the subloader to ensure the scaling is properly dispatched
           panelContentLoader.active = false
           panelContentLoader.active = true
+
+          // If called from IPC always reposition if screen is updated
+          if (buttonName) {
+            setPosition()
+          }
+          // Logger.log("NPanel", "OnScreenChanged", root.screen.name)
         }
       }
 
@@ -193,7 +189,7 @@ Loader {
 
       Behavior on color {
         ColorAnimation {
-          duration: Style.animationSlow
+          duration: Style.animationNormal
         }
       }
 
@@ -205,7 +201,7 @@ Loader {
       // Close any panel with Esc without requiring focus
       Shortcut {
         sequences: ["Escape"]
-        enabled: root.active && !root.isClosing
+        enabled: root.active
         onActivated: root.close()
         context: Qt.WindowShortcut
       }
@@ -263,7 +259,7 @@ Loader {
           if (!barIsVisible) {
             return 0
           }
-          switch (barPosition || panelAnchorVerticalCenter) {
+          switch (barPosition) {
           case "top":
             return (Style.barHeight + Style.marginS) * scaling + (Settings.data.bar.floating ? Settings.data.bar.marginVertical * Style.marginXL * scaling : 0)
           default:
@@ -272,7 +268,7 @@ Loader {
         }
 
         property real marginBottom: {
-          if (!barIsVisible || panelAnchorVerticalCenter) {
+          if (!barIsVisible) {
             return 0
           }
           switch (barPosition) {
@@ -284,7 +280,7 @@ Loader {
         }
 
         property real marginLeft: {
-          if (!barIsVisible || panelAnchorHorizontalCenter) {
+          if (!barIsVisible) {
             return 0
           }
           switch (barPosition) {
@@ -296,7 +292,7 @@ Loader {
         }
 
         property real marginRight: {
-          if (!barIsVisible || panelAnchorHorizontalCenter) {
+          if (!barIsVisible) {
             return 0
           }
           switch (barPosition) {
@@ -311,7 +307,11 @@ Loader {
         property int calculatedX: {
           // Priority to fixed anchoring
           if (panelAnchorHorizontalCenter) {
-            return Math.round((panelWindow.width - panelBackground.width) / 2)
+            // Center horizontally but respect bar margins
+            var centerX = Math.round((panelWindow.width - panelBackground.width) / 2)
+            var minX = marginLeft
+            var maxX = panelWindow.width - panelBackground.width - marginRight
+            return Math.round(Math.max(minX, Math.min(centerX, maxX)))
           } else if (panelAnchorLeft) {
             return marginLeft
           } else if (panelAnchorRight) {
@@ -348,7 +348,11 @@ Loader {
         property int calculatedY: {
           // Priority to fixed anchoring
           if (panelAnchorVerticalCenter) {
-            return Math.round((panelWindow.height - panelBackground.height) / 2)
+            // Center vertically but respect bar margins
+            var centerY = Math.round((panelWindow.height - panelBackground.height) / 2)
+            var minY = marginTop
+            var maxY = panelWindow.height - panelBackground.height - marginBottom
+            return Math.round(Math.max(minY, Math.min(centerY, maxY)))
           } else if (panelAnchorTop) {
             return marginTop
           } else if (panelAnchorBottom) {
@@ -403,7 +407,7 @@ Loader {
         // Animation behaviors
         Behavior on scale {
           NumberAnimation {
-            duration: Style.animationSlow
+            duration: Style.animationNormal
             easing.type: Easing.OutExpo
           }
         }

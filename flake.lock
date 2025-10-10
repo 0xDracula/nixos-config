@@ -416,22 +416,6 @@
         "type": "github"
       }
     },
-    "nixpkgs_7": {
-      "locked": {
-        "lastModified": 1758690382,
-        "narHash": "sha256-NY3kSorgqE5LMm1LqNwGne3ZLMF2/ILgLpFr1fS4X3o=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "e643668fd71b949c53f8626614b21ff71a07379d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixvim": {
       "inputs": {
         "flake-parts": "flake-parts_3",
@@ -671,18 +655,21 @@
     },
     "winboat": {
       "inputs": {
-        "nixpkgs": "nixpkgs_7"
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1759281053,
-        "narHash": "sha256-Rk3lw6lUw30lXpiHR0zvXLIaJacK0uSjMBOwDR+AkfM=",
-        "owner": "TibixDev",
+        "lastModified": 1760091228,
+        "narHash": "sha256-Jds9Q+26pWBqxcDg2mmfFGpbFdoOtANgirvwOf6PMkQ=",
+        "owner": "Rexcrazy804",
         "repo": "winboat",
-        "rev": "81636f6e3e1e6f7fe01691385bc17090dee8a229",
+        "rev": "ebe8c6301de068bf6092cfb9a4efa0520c8ba258",
         "type": "github"
       },
       "original": {
-        "owner": "TibixDev",
+        "owner": "Rexcrazy804",
+        "ref": "fix-nix",
         "repo": "winboat",
         "type": "github"
       }

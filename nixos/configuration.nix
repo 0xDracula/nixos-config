@@ -25,6 +25,7 @@
     # Import your generated (nixos-generate-config) hardware configuration
     ./modules
     ./hardware-configuration.nix
+    inputs.winboat.nixosModules.default
   ];
   qt = {
     platformTheme = "gnome";
@@ -97,7 +98,7 @@
     };
 
   };
-
+  services.winboat.enable = true;
   boot.kernelParams = ["resume_offset=77438976"];
   boot.resumeDevice = "/dev/disk/by-label/root";
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -125,7 +126,7 @@
     enable = true;
   };
 
-  services.open-webui.enable = true;
+  #services.open-webui.enable = true;
   services.flatpak.enable = true;
   users.users = {
     dracula = {
@@ -211,15 +212,15 @@
       enable = true;
       qemu = {
         swtpm.enable = true;
-        ovmf.enable = true;
-        ovmf.packages = [ pkgs.OVMFFull.fd ];
       };
     };
     spiceUSBRedirection.enable = true;
   };
   services.spice-vdagentd.enable = true;
   qt.enable = true;
-
+  xdg.mime.defaultApplications = {
+    "application/pdf" = "okularApplication_pdf.desktop";
+  };
   services.tor = {
     enable = true;
     client.enable = true;

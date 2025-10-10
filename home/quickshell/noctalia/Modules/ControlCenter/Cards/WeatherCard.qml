@@ -18,6 +18,7 @@ NBox {
     anchors.top: parent.top
     anchors.margins: Style.marginM * scaling
     spacing: Style.marginM * scaling
+    clip: true
 
     RowLayout {
       spacing: Style.marginS * scaling
@@ -84,7 +85,7 @@ NBox {
         model: weatherReady ? LocationService.data.weather.daily.time : []
         delegate: ColumnLayout {
           Layout.alignment: Qt.AlignHCenter
-          spacing: Style.marginL * scaling
+          spacing: Style.marginS * scaling
           NText {
             text: {
               var weatherDate = new Date(LocationService.data.weather.daily.time[index].replace(/-/g, "/"))

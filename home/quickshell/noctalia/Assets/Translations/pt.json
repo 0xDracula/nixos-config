@@ -18,6 +18,10 @@
           "label": "Interface do usuário",
           "description": "Personalize a aparência, a sensação e o comportamento da interface."
         },
+        "tooltips": {
+          "label": "Mostrar tooltips",
+          "description": "Ativar ou desativar tooltips em toda a interface."
+        },
         "dim-desktop": {
           "label": "Escurecer área de trabalho",
           "description": "Escurece a área de trabalho quando painéis ou menus estão abertos."
@@ -62,13 +66,32 @@
           "label": "Fonte padrão",
           "description": "Fonte principal usada em toda a interface.",
           "placeholder": "Selecione a fonte padrão...",
-          "search-placeholder": "Pesquisar fontes..."
+          "search-placeholder": "Pesquisar fontes...",
+          "scale": {
+            "description": "Aumentar ou diminuir o tamanho do texto padrão.",
+            "label": "Tamanho de fonte padrão"
+          }
         },
         "monospace": {
           "label": "Fonte monoespaçada",
           "description": "Fonte monoespaçada usada para exibição de números e estatísticas.",
           "placeholder": "Selecione a fonte monoespaçada...",
-          "search-placeholder": "Pesquisar fontes monoespaçadas..."
+          "search-placeholder": "Pesquisar fontes monoespaçadas...",
+          "scale": {
+            "description": "Aumentar ou diminuir o tamanho do texto monoespaçado.",
+            "label": "Tamanho da fonte monoespaçada"
+          }
+        },
+        "reset-scaling": "Redefinir escala"
+      },
+      "control-center": {
+        "section": {
+          "label": "Centro de controle",
+          "description": "Configurar o posicionamento e comportamento do painel do centro de controle."
+        },
+        "position": {
+          "label": "Posição",
+          "description": "Escolha onde o painel do centro de controle aparece quando aberto."
         }
       }
     },
@@ -253,13 +276,12 @@
           "label": "Aparência",
           "description": "Personalize o comportamento e a aparência da dock."
         },
-        "auto-hide": {
-          "label": "Ocultar automaticamente",
-          "description": "Oculta automaticamente quando não está em uso."
-        },
-        "exclusive-zone": {
-          "label": "Zona exclusiva",
-          "description": "Impede a sobreposição de janelas."
+        "display": {
+          "label": "Exibição",
+          "description": "Escolha como a dock se comporta.",
+          "always-visible": "Sempre visível",
+          "auto-hide": "Ocultar automaticamente",
+          "exclusive": "Exclusivo"
         },
         "background-opacity": {
           "label": "Opacidade do fundo",
@@ -274,6 +296,10 @@
         "section": {
           "label": "Exibição no monitor",
           "description": "Escolha em qual monitor exibir a dock."
+        },
+        "only-same-output": {
+          "description": "Mostrar apenas aplicativos da saída onde o dock está localizado.",
+          "label": "Apenas aplicativos da mesma saída"
         }
       }
     },
@@ -303,6 +329,10 @@
         "use-app2unit": {
           "label": "Usar App2Unit para iniciar aplicativos",
           "description": "Usa um método de inicialização alternativo para gerenciar melhor os processos de aplicativos e evitar problemas."
+        },
+        "terminal-command": {
+          "label": "Comando do terminal",
+          "description": "Comando para iniciar um terminal. Ex: 'kitty -e' ou 'gnome-terminal --'."
         }
       }
     },
@@ -437,9 +467,9 @@
           "label": "Modo escuro",
           "description": "Muda para um tema mais escuro para facilitar a visualização à noite."
         },
-        "enable-matugen": {
-          "label": "Ativar Matugen",
-          "description": "Gera cores automaticamente com base no seu papel de parede ativo."
+        "use-wallpaper-colors": {
+          "label": "Usar cores do papel de parede",
+          "description": "Gerar esquemas de cores do seu papel de parede usando Matugen. Extrai automaticamente cores para criar um tema coeso."
         },
         "matugen-scheme-type": {
           "label": "Tipo de esquema Matugen",
@@ -450,26 +480,20 @@
         "section": {
           "label": "Esquemas de cores predefinidos",
           "description": "Escolha entre uma coleção de esquemas de cores predefinidos."
+        },
+        "generate-templates": {
+          "label": "Gerar modelos para esquemas predefinidos",
+          "description": "Gera modelos Matugen (GTK, temas de terminal, etc.) ao usar esquemas de cores predefinidos."
         }
       },
-      "matugen": {
-        "section": {
-          "label": "Modelos Matugen",
-          "description": "Aplique cores a aplicativos externos."
-        },
+      "templates": {
         "ui": {
           "label": "UI",
           "description": "Tematização do ambiente de desktop e kit de ferramentas de UI.",
-          "gtk4": {
+          "gtk": {
             "description": "Escrever {filepath}"
           },
-          "gtk3": {
-            "description": "Escrever {filepath}"
-          },
-          "qt6": {
-            "description": "Escrever {filepath}"
-          },
-          "qt5": {
+          "qt": {
             "description": "Escrever {filepath}"
           }
         },
@@ -512,6 +536,10 @@
             "label": "Modelos do usuário",
             "description": "Ativa a configuração do Matugen definida pelo usuário em ~/.config/matugen/config.toml"
           }
+        },
+        "section": {
+          "description": "Aplicar cores a aplicações externas.",
+          "label": "Modelos"
         }
       }
     },
@@ -544,8 +572,8 @@
           "description": "Personalize como a data e a hora aparecem."
         },
         "12hour-format": {
-          "label": "Usar formato de 12 horas na tela de bloqueio",
-          "description": "Ativado para formato AM/PM (ex., 8:00 PM), desativado para formato de 24 horas (ex., 20:00)."
+          "description": "Ativado para formato AM/PM (ex., 8:00 PM), desativado para formato de 24 horas (ex., 20:00).",
+          "label": "Use o formato de hora de 12 horas"
         },
         "week-numbers": {
           "label": "Mostrar números da semana",
@@ -819,6 +847,10 @@
         "scrolling-mode": {
           "label": "Modo de rolagem",
           "description": "Controlar quando a rolagem de texto está habilitada para títulos de janela longos."
+        },
+        "width": {
+          "description": "Controla o tamanho horizontal do widget.",
+          "label": "Largura do Widget"
         }
       },
       "system-monitor": {
@@ -968,7 +1000,8 @@
         "scrolling-mode": {
           "label": "Modo de rolagem",
           "description": "Controlar quando a rolagem de texto está habilitada para títulos de faixa longos."
-        }
+        },
+        "no-active-player": "Nenhum player ativo"
       },
       "clock": {
         "use-primary-color": {
@@ -991,7 +1024,27 @@
           "label": "Barra vertical",
           "description": "Use um espaço para separar cada parte em uma nova linha."
         },
-        "preview": "Pré-visualização"
+        "preview": "Pré-visualização",
+        "custom-font": {
+          "description": "Selecione uma fonte personalizada para a exibição do relógio.",
+          "label": "Fonte personalizada",
+          "placeholder": "Selecionar fonte personalizada...",
+          "search-placeholder": "Procurar fontes..."
+        },
+        "use-custom-font": {
+          "description": "Substitua a fonte padrão por uma fonte personalizada para o relógio.",
+          "label": "Usar fonte personalizada"
+        }
+      },
+      "taskbar": {
+        "only-active-workspaces": {
+          "description": "Mostrar apenas aplicativos de áreas de trabalho ativas.",
+          "label": "Apenas de espaços de trabalho ativos"
+        },
+        "only-same-output": {
+          "description": "Mostrar apenas os aplicativos da saída onde a barra está localizada.",
+          "label": "Apenas da mesma saída"
+        }
       }
     }
   },
@@ -999,7 +1052,8 @@
     "panel": {
       "title": "Notificações",
       "no-notifications": "Nenhuma notificação",
-      "description": "Suas notificações aparecerão aqui assim que chegarem."
+      "description": "Suas notificações aparecerão aqui assim que chegarem.",
+      "click-to-expand": "Clique para expandir"
     }
   },
   "wallpaper": {
@@ -1102,6 +1156,7 @@
     "night-light-disabled": "Luz noturna desativada.\nClique esquerdo para alternar o modo.\nClique direito para acessar as configurações.",
     "night-light-enabled": "Luz noturna ativada.\nClique esquerdo para alternar o modo.\nClique direito para acessar as configurações.",
     "night-light-forced": "Luz noturna forçada.\nClique esquerdo para alternar o modo.\nClique direito para acessar as configurações.",
+    "night-light-not-installed": "Luz noturna não disponível.\nwlsunset não está instalado.",
     "click-to-start-recording": "Clique para iniciar a gravação",
     "click-to-stop-recording": "Clique para parar a gravação",
     "open-control-center": "Abrir central de controle",
@@ -1171,6 +1226,17 @@
         "top_center": "Centro superior",
         "center_left": "Centro à esquerda",
         "center_right": "Centro à direita"
+      }
+    },
+    "control-center": {
+      "position": {
+        "close_to_bar_button": "Perto do botão da barra",
+        "top_left": "Superior esquerdo",
+        "top_right": "Superior direito",
+        "bottom_left": "Inferior esquerdo",
+        "bottom_right": "Inferior direito",
+        "bottom_center": "Centro inferior",
+        "top_center": "Centro superior"
       }
     },
     "bar": {
@@ -1245,7 +1311,10 @@
     "reboot": "Reiniciar",
     "logout": "Sair",
     "logout-subtitle": "Encerre sua sessão",
-    "shutdown": "Desligar"
+    "shutdown": "Desligar",
+    "reboot-subtitle": "Reinicie o seu computador.",
+    "shutdown-subtitle": "Desligue o seu computador.",
+    "suspend-subtitle": "Colocar o sistema em suspensão."
   },
   "plugins": {
     "applications": "Aplicativos",
@@ -1282,9 +1351,10 @@
     "unknown-layout": "Desconhecido"
   },
   "lock-screen": {
-    "secure-terminal": "TERMINAL SEGURO",
-    "unlock-command": "sudo unlock-session",
-    "password": "Senha:",
+    "password": "Digite sua senha...",
+    "welcome-back": "Bem-vindo de volta,",
+    "authenticating": "Autenticando...",
+    "authentication-failed": "Falha na autenticação",
     "shut-down": "Desligar",
     "restart": "Reiniciar",
     "suspend": "Suspender"
@@ -1301,10 +1371,10 @@
       "enabled": "Ativado",
       "disabled": "Desativado"
     },
-    "matugen": {
-      "enabled": "Ativado",
-      "disabled": "Desativado",
-      "not-installed": "Não instalado"
+    "wallpaper-colors": {
+      "enabled": "Cores do papel de parede ativadas",
+      "disabled": "Cores do papel de parede desativadas",
+      "not-installed": "Matugen não instalado - necessário para extração de cores do papel de parede"
     },
     "recording": {
       "stopping": "Parando gravação…",
@@ -1314,7 +1384,9 @@
       "failed-gpu": "gpu-screen-recorder encerrou inesperadamente.",
       "failed-general": "O gravador encerrou com um erro.",
       "no-portals": "Portais de desktop não estão em execução",
-      "no-portals-desc": "Inicie o xdg-desktop-portal e um portal de compositor (wlr/hyprland/gnome/kde)."
+      "no-portals-desc": "Inicie o xdg-desktop-portal e um portal de compositor (wlr/hyprland/gnome/kde).",
+      "not-installed": "gpu-screen-recorder não instalado",
+      "not-installed-desc": "Por favor instale o gpu-screen-recorder para usar as funcionalidades de gravação de tela."
     },
     "clipboard": {
       "unavailable": "Histórico da área de transferência indisponível",
@@ -1354,7 +1426,7 @@
     },
     "missing-control-center": {
       "label": "Último widget da Central de Controle removido",
-      "description": "O widget da Central de Controle foi removido da barra. Para acessá-lo novamente pela barra, adicione o widget novamente."
+      "description": "O widget da Central de Controle foi removido da barra. Para acessá-lo novamente pela barra, adicione o widget novamente. Você também pode abri-lo clicando com o botão direito na barra."
     }
   },
   "weather": {

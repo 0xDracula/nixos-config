@@ -82,6 +82,13 @@ ColumnLayout {
       onToggled: checked => Settings.data.general.dimDesktop = checked
     }
 
+    NToggle {
+      label: I18n.tr("settings.general.ui.tooltips.label")
+      description: I18n.tr("settings.general.ui.tooltips.description")
+      checked: Settings.data.ui.tooltipsEnabled
+      onToggled: checked => Settings.data.ui.tooltipsEnabled = checked
+    }
+
     ColumnLayout {
       spacing: Style.marginXXS * scaling
       Layout.fillWidth: true
@@ -194,6 +201,56 @@ ColumnLayout {
     Layout.bottomMargin: Style.marginXL * scaling
   }
 
+  // Control Center
+  ColumnLayout {
+    spacing: Style.marginL * scaling
+    Layout.fillWidth: true
+
+    NHeader {
+      label: I18n.tr("settings.general.control-center.section.label")
+      description: I18n.tr("settings.general.control-center.section.description")
+    }
+
+    NComboBox {
+      id: controlCenterPosition
+      label: I18n.tr("settings.general.control-center.position.label")
+      description: I18n.tr("settings.general.control-center.position.description")
+      Layout.fillWidth: true
+      model: [{
+          "key": "close_to_bar_button",
+          "name": I18n.tr("options.control-center.position.close_to_bar_button")
+        }, {
+          "key": "top_left",
+          "name": I18n.tr("options.control-center.position.top_left")
+        }, {
+          "key": "top_right",
+          "name": I18n.tr("options.control-center.position.top_right")
+        }, {
+          "key": "bottom_left",
+          "name": I18n.tr("options.control-center.position.bottom_left")
+        }, {
+          "key": "bottom_right",
+          "name": I18n.tr("options.control-center.position.bottom_right")
+        }, {
+          "key": "bottom_center",
+          "name": I18n.tr("options.control-center.position.bottom_center")
+        }, {
+          "key": "top_center",
+          "name": I18n.tr("options.control-center.position.top_center")
+        }]
+      currentKey: Settings.data.controlCenter.position
+      onSelected: function (key) {
+        Settings.data.controlCenter.position = key
+      }
+    }
+  }
+
+  NDivider {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.marginXL * scaling
+    Layout.bottomMargin: Style.marginXL * scaling
+  }
+
   // Fonts
   ColumnLayout {
     spacing: Style.marginL * scaling
@@ -264,7 +321,7 @@ ColumnLayout {
 
             NIconButton {
               icon: "refresh"
-              baseSize: Style.baseWidgetSize * 0.9
+              baseSize: Style.baseWidgetSize * 0.8
               tooltipText: I18n.tr("settings.general.fonts.reset-scaling")
               onClicked: Settings.data.ui.fontDefaultScale = 1.0
               anchors.right: parent.right
@@ -301,7 +358,7 @@ ColumnLayout {
 
             NIconButton {
               icon: "refresh"
-              baseSize: Style.baseWidgetSize * 0.9
+              baseSize: Style.baseWidgetSize * 0.8
               tooltipText: I18n.tr("settings.general.fonts.reset-scaling")
               onClicked: Settings.data.ui.fontFixedScale = 1.0
               anchors.right: parent.right

@@ -40,6 +40,22 @@ NPanel {
 
     color: Color.transparent
 
+    // Debounce timer for search
+    Timer {
+      id: searchDebounceTimer
+      interval: 150
+      onTriggered: {
+        wallpaperPanel.filterText = searchInput.text
+        // Trigger update on all screen views
+        for (var i = 0; i < screenRepeater.count; i++) {
+          let item = screenRepeater.itemAt(i)
+          if (item && item.updateFiltered) {
+            item.updateFiltered()
+          }
+        }
+      }
+    }
+
     ColumnLayout {
       anchors.fill: parent
       anchors.margins: Style.marginL * scaling
@@ -199,13 +215,13 @@ NPanel {
           Layout.fillWidth: true
 
           onTextChanged: {
-            wallpaperPanel.filterText = searchInput.text
-            // Trigger update on all screen views
-            for (var i = 0; i < screenRepeater.count; i++) {
-              let item = screenRepeater.itemAt(i)
-              if (item && item.updateFiltered) {
-                item.updateFiltered()
-              }
+            searchDebounceTimer.restart()
+          }
+
+          Keys.onDownPressed: {
+            let currentView = screenRepeater.itemAt(currentScreenIndex)
+            if (currentView && currentView.gridView) {
+              currentView.gridView.forceActiveFocus()
             }
           }
 
@@ -222,11 +238,13 @@ NPanel {
   // Component for each screen's wallpaper view
   component WallpaperScreenView: Item {
     property var targetScreen
+    property alias gridView: wallpaperGridView
 
     // Local reactive state for this screen
     property list<string> wallpapersList: []
     property string currentWallpaper: ""
     property list<string> filteredWallpapers: []
+    property var wallpapersWithNames: [] // Cached basenames
 
     // Expose updateFiltered as a proper function property
     function updateFiltered() {
@@ -234,14 +252,8 @@ NPanel {
         filteredWallpapers = wallpapersList
         return
       }
-      // Build objects with basename for ranking
-      const items = wallpapersList.map(function (p) {
-        return {
-          "path": p,
-          "name": p.split('/').pop()
-        }
-      })
-      const results = FuzzySort.go(wallpaperPanel.filterText.trim(), items, {
+
+      const results = FuzzySort.go(wallpaperPanel.filterText.trim(), wallpapersWithNames, {
                                      "key": 'name',
                                      "limit": 200
                                    })
@@ -279,190 +291,231 @@ NPanel {
         return
       }
       wallpapersList = WallpaperService.getWallpapersList(targetScreen.name)
+
+      // Pre-compute basenames once for better performance
+      wallpapersWithNames = wallpapersList.map(function (p) {
+        return {
+          "path": p,
+          "name": p.split('/').pop()
+        }
+      })
+
       currentWallpaper = WallpaperService.getWallpaper(targetScreen.name)
       updateFiltered()
     }
 
-    // Scroll container for wallpaper grid only
-    Flickable {
+    ColumnLayout {
       anchors.fill: parent
-      pressDelay: 200
+      spacing: Style.marginM * scaling
 
-      NScrollView {
-        id: scrollView
-        anchors.fill: parent
-        horizontalPolicy: ScrollBar.AlwaysOff
-        verticalPolicy: ScrollBar.AsNeeded
-        padding: Style.marginL * 0 * scaling
+      GridView {
+        id: wallpaperGridView
+
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        visible: !WallpaperService.scanning
+        interactive: true
         clip: true
+        focus: true
+        keyNavigationEnabled: true
+        keyNavigationWraps: false
 
-        ColumnLayout {
-          width: scrollView.availableWidth
-          spacing: Style.marginM * scaling
+        model: filteredWallpapers
 
-          // Grid container
-          Item {
-            visible: !WallpaperService.scanning
+        property int columns: 4
+        property int itemSize: cellWidth
+
+        cellWidth: Math.floor((width - leftMargin - rightMargin) / columns)
+        cellHeight: Math.floor(itemSize * 0.7) + Style.marginXS * scaling + Style.fontSizeXS * scaling + Style.marginM * scaling
+
+        leftMargin: Style.marginS * scaling
+        rightMargin: Style.marginS * scaling
+        topMargin: Style.marginS * scaling
+        bottomMargin: Style.marginS * scaling
+
+        onCurrentIndexChanged: {
+          // Synchronize scroll with current item position
+          if (currentIndex >= 0) {
+            let row = Math.floor(currentIndex / columns)
+            let itemY = row * cellHeight
+            let viewportTop = contentY
+            let viewportBottom = viewportTop + height
+
+            // If item is out of view, scroll
+            if (itemY < viewportTop) {
+              contentY = Math.max(0, itemY - cellHeight)
+            } else if (itemY + cellHeight > viewportBottom) {
+              contentY = itemY + cellHeight - height + cellHeight
+            }
+          }
+        }
+
+        Keys.onPressed: event => {
+                          if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
+                            if (currentIndex >= 0 && currentIndex < filteredWallpapers.length) {
+                              let path = filteredWallpapers[currentIndex]
+                              if (Settings.data.wallpaper.setWallpaperOnAllMonitors) {
+                                WallpaperService.changeWallpaper(path, undefined)
+                              } else {
+                                WallpaperService.changeWallpaper(path, targetScreen.name)
+                              }
+                            }
+                            event.accepted = true
+                          }
+                        }
+
+        ScrollBar.vertical: ScrollBar {
+          policy: ScrollBar.AsNeeded
+        }
+
+        delegate: ColumnLayout {
+          id: wallpaperItem
+
+          property string wallpaperPath: modelData
+          property bool isSelected: (wallpaperPath === currentWallpaper)
+          property string filename: wallpaperPath.split('/').pop()
+
+          width: wallpaperGridView.itemSize
+          spacing: Style.marginXS * scaling
+
+          Rectangle {
+            id: imageContainer
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.ceil(filteredWallpapers.length / wallpaperGridView.columns) * wallpaperGridView.cellHeight
+            Layout.preferredHeight: Math.round(wallpaperGridView.itemSize * 0.67)
+            color: Color.transparent
 
-            GridView {
-              id: wallpaperGridView
+            NImageCached {
+              id: img
+              maxCacheDimension: 384
+              imagePath: wallpaperPath
+              cacheFolder: Settings.cacheDirImagesWallpapers
               anchors.fill: parent
-              model: filteredWallpapers
-              interactive: false
+            }
 
-              property int columns: 4
-              property int itemSize: Math.floor((width - leftMargin - rightMargin - (columns * Style.marginS * scaling)) / columns)
-
-              cellWidth: Math.floor((width - leftMargin - rightMargin) / columns)
-              cellHeight: Math.floor(itemSize * 0.7) + Style.marginXS * scaling + Style.fontSizeXS * scaling + Style.marginM * scaling
-
-              leftMargin: Style.marginS * scaling
-              rightMargin: Style.marginS * scaling
-              topMargin: Style.marginS * scaling
-              bottomMargin: Style.marginS * scaling
-
-              delegate: ColumnLayout {
-                id: wallpaperItem
-
-                property string wallpaperPath: modelData
-                property bool isSelected: (wallpaperPath === currentWallpaper)
-                property string filename: wallpaperPath.split('/').pop()
-
-                width: wallpaperGridView.itemSize
-                spacing: Style.marginXS * scaling
-
-                Rectangle {
-                  id: imageContainer
-                  Layout.fillWidth: true
-                  Layout.preferredHeight: Math.round(wallpaperGridView.itemSize * 0.67)
-                  color: Color.transparent
-
-                  NImageCached {
-                    id: img
-                    imagePath: wallpaperPath
-                    cacheFolder: Settings.cacheDirImagesWallpapers
-                    anchors.fill: parent
-                  }
-
-                  Rectangle {
-                    anchors.fill: parent
-                    color: Color.transparent
-                    border.color: isSelected ? Color.mSecondary : Color.mSurface
-                    border.width: Math.max(1, Style.borderL * 1.5 * scaling)
-                  }
-
-                  Rectangle {
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.margins: Style.marginS * scaling
-                    width: 28 * scaling
-                    height: 28 * scaling
-                    radius: width / 2
-                    color: Color.mSecondary
-                    border.color: Color.mOutline
-                    border.width: Math.max(1, Style.borderS * scaling)
-                    visible: isSelected
-
-                    NIcon {
-                      icon: "check"
-                      pointSize: Style.fontSizeM * scaling
-                      font.weight: Style.fontWeightBold
-                      color: Color.mOnSecondary
-                      anchors.centerIn: parent
-                    }
-                  }
-
-                  Rectangle {
-                    anchors.fill: parent
-                    color: Color.mSurface
-                    opacity: (mouseArea.containsMouse || isSelected) ? 0 : 0.3
-                    radius: parent.radius
-                    Behavior on opacity {
-                      NumberAnimation {
-                        duration: Style.animationFast
-                      }
-                    }
-                  }
-
-                  MouseArea {
-                    id: mouseArea
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton
-                    hoverEnabled: true
-                    onPressed: {
-                      if (Settings.data.wallpaper.setWallpaperOnAllMonitors) {
-                        WallpaperService.changeWallpaper(wallpaperPath, undefined)
-                      } else {
-                        WallpaperService.changeWallpaper(wallpaperPath, targetScreen.name)
-                      }
-                    }
-                  }
+            Rectangle {
+              anchors.fill: parent
+              color: Color.transparent
+              border.color: {
+                if (isSelected) {
+                  return Color.mSecondary
                 }
+                if (wallpaperGridView.currentIndex === index) {
+                  return Color.mTertiary
+                }
+                return Color.mSurface
+              }
+              border.width: Math.max(1, Style.borderL * 1.5 * scaling)
+            }
 
-                NText {
-                  text: filename
-                  color: Color.mOnSurfaceVariant
-                  opacity: 0.5
-                  pointSize: Style.fontSizeXS * scaling
-                  Layout.fillWidth: true
-                  Layout.leftMargin: Style.marginS * scaling
-                  Layout.rightMargin: Style.marginS * scaling
-                  Layout.alignment: Qt.AlignHCenter
-                  horizontalAlignment: Text.AlignHCenter
-                  elide: Text.ElideRight
+            Rectangle {
+              anchors.top: parent.top
+              anchors.right: parent.right
+              anchors.margins: Style.marginS * scaling
+              width: 28 * scaling
+              height: 28 * scaling
+              radius: width / 2
+              color: Color.mSecondary
+              border.color: Color.mOutline
+              border.width: Math.max(1, Style.borderS * scaling)
+              visible: isSelected
+
+              NIcon {
+                icon: "check"
+                pointSize: Style.fontSizeM * scaling
+                font.weight: Style.fontWeightBold
+                color: Color.mOnSecondary
+                anchors.centerIn: parent
+              }
+            }
+
+            Rectangle {
+              anchors.fill: parent
+              color: Color.mSurface
+              opacity: (hoverHandler.hovered || isSelected || wallpaperGridView.currentIndex === index) ? 0 : 0.3
+              radius: parent.radius
+              Behavior on opacity {
+                NumberAnimation {
+                  duration: Style.animationFast
+                }
+              }
+            }
+
+            // More efficient hover handling
+            HoverHandler {
+              id: hoverHandler
+            }
+
+            TapHandler {
+              onTapped: {
+                wallpaperGridView.currentIndex = index
+                if (Settings.data.wallpaper.setWallpaperOnAllMonitors) {
+                  WallpaperService.changeWallpaper(wallpaperPath, undefined)
+                } else {
+                  WallpaperService.changeWallpaper(wallpaperPath, targetScreen.name)
                 }
               }
             }
           }
 
-          // Empty / scanning state
-          Rectangle {
-            color: Color.mSurface
-            radius: Style.radiusM * scaling
-            border.color: Color.mOutline
-            border.width: Math.max(1, Style.borderS * scaling)
-            visible: (filteredWallpapers.length === 0 && !WallpaperService.scanning) || WallpaperService.scanning
+          NText {
+            text: filename
+            color: (hoverHandler.hovered || isSelected || wallpaperGridView.currentIndex === index) ? Color.mOnSurface : Color.mOnSurfaceVariant
+            pointSize: Style.fontSizeXS * scaling
             Layout.fillWidth: true
-            Layout.preferredHeight: 130 * scaling
+            Layout.leftMargin: Style.marginS * scaling
+            Layout.rightMargin: Style.marginS * scaling
+            Layout.alignment: Qt.AlignHCenter
+            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
+          }
+        }
+      }
 
-            ColumnLayout {
-              anchors.fill: parent
-              visible: WallpaperService.scanning
-              NBusyIndicator {
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-              }
-            }
+      // Empty / scanning state
+      Rectangle {
+        color: Color.mSurface
+        radius: Style.radiusM * scaling
+        border.color: Color.mOutline
+        border.width: Math.max(1, Style.borderS * scaling)
+        visible: (filteredWallpapers.length === 0 && !WallpaperService.scanning) || WallpaperService.scanning
+        Layout.fillWidth: true
+        Layout.preferredHeight: 130 * scaling
 
-            ColumnLayout {
-              anchors.fill: parent
-              visible: filteredWallpapers.length === 0 && !WallpaperService.scanning
-              Item {
-                Layout.fillHeight: true
-              }
-              NIcon {
-                icon: "folder-open"
-                pointSize: Style.fontSizeXXL * scaling
-                color: Color.mOnSurface
-                Layout.alignment: Qt.AlignHCenter
-              }
-              NText {
-                text: (wallpaperPanel.filterText && wallpaperPanel.filterText.length > 0) ? I18n.tr("wallpaper.no-match") : I18n.tr("wallpaper.no-wallpaper")
-                color: Color.mOnSurface
-                font.weight: Style.fontWeightBold
-                Layout.alignment: Qt.AlignHCenter
-              }
-              NText {
-                text: (wallpaperPanel.filterText && wallpaperPanel.filterText.length > 0) ? I18n.tr("wallpaper.try-different-search") : I18n.tr("wallpaper.configure-directory")
-                color: Color.mOnSurfaceVariant
-                wrapMode: Text.WordWrap
-                Layout.alignment: Qt.AlignHCenter
-              }
-              Item {
-                Layout.fillHeight: true
-              }
-            }
+        ColumnLayout {
+          anchors.fill: parent
+          visible: WallpaperService.scanning
+          NBusyIndicator {
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+          }
+        }
+
+        ColumnLayout {
+          anchors.fill: parent
+          visible: filteredWallpapers.length === 0 && !WallpaperService.scanning
+          Item {
+            Layout.fillHeight: true
+          }
+          NIcon {
+            icon: "folder-open"
+            pointSize: Style.fontSizeXXL * scaling
+            color: Color.mOnSurface
+            Layout.alignment: Qt.AlignHCenter
+          }
+          NText {
+            text: (wallpaperPanel.filterText && wallpaperPanel.filterText.length > 0) ? I18n.tr("wallpaper.no-match") : I18n.tr("wallpaper.no-wallpaper")
+            color: Color.mOnSurface
+            font.weight: Style.fontWeightBold
+            Layout.alignment: Qt.AlignHCenter
+          }
+          NText {
+            text: (wallpaperPanel.filterText && wallpaperPanel.filterText.length > 0) ? I18n.tr("wallpaper.try-different-search") : I18n.tr("wallpaper.configure-directory")
+            color: Color.mOnSurfaceVariant
+            wrapMode: Text.WordWrap
+            Layout.alignment: Qt.AlignHCenter
+          }
+          Item {
+            Layout.fillHeight: true
           }
         }
       }

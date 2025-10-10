@@ -27,8 +27,6 @@ Singleton {
   property string settingsFile: Quickshell.env("NOCTALIA_SETTINGS_FILE") || (configDir + "settings.json")
 
   property string defaultLocation: "Tokyo"
-  property string defaultWallpaper: Quickshell.shellDir + "/Assets/Wallpaper/noctalia.png"
-
   property string defaultAvatar: Quickshell.env("HOME") + "/.face"
   property string defaultVideosDirectory: Quickshell.env("HOME") + "/Videos"
   property string defaultWallpapersDirectory: Quickshell.env("HOME") + "/Pictures/Wallpapers"
@@ -60,6 +58,7 @@ Singleton {
     adapter.general.avatarImage = defaultAvatar
     adapter.screenRecorder.directory = defaultVideosDirectory
     adapter.wallpaper.directory = defaultWallpapersDirectory
+    adapter.wallpaper.defaultWallpaper = Quickshell.shellDir + "/Assets/Wallpaper/noctalia.png"
 
     // Set the adapter to the settingsFileView to trigger the real settings load
     settingsFileView.adapter = adapter
@@ -129,7 +128,7 @@ Singleton {
   JsonAdapter {
     id: adapter
 
-    property int settingsVersion: 12
+    property int settingsVersion: 15
 
     // bar
     property JsonObject bar: JsonObject {
@@ -220,6 +219,7 @@ Singleton {
       property string directory: ""
       property bool enableMultiMonitorDirectories: false
       property bool setWallpaperOnAllMonitors: true
+      property string defaultWallpaper: ""
       property string fillMode: "crop"
       property color fillColor: "#000000"
       property bool randomEnabled: false
@@ -239,14 +239,21 @@ Singleton {
       property list<string> pinnedExecs: []
       property bool useApp2Unit: false
       property bool sortByMostUsed: true
+      property string terminalCommand: "xterm -e"
+    }
+
+    // control center
+    property JsonObject controlCenter: JsonObject {
+      // Position: close_to_bar_button, center, top_left, top_right, bottom_left, bottom_right, bottom_center, top_center
+      property string position: "close_to_bar_button"
     }
 
     // dock
     property JsonObject dock: JsonObject {
-      property bool autoHide: false
-      property bool exclusive: false
+      property string displayMode: "always_visible" // "always_visible", "auto_hide", "exclusive"
       property real backgroundOpacity: 1.0
       property real floatingRatio: 1.0
+      property bool onlySameOutput: true
       property list<string> monitors: []
       // Desktop entry IDs pinned to the dock (e.g., "org.kde.konsole", "firefox.desktop")
       property list<string> pinnedApps: []
@@ -296,6 +303,7 @@ Singleton {
       property real fontFixedScale: 1.0
       property list<var> monitorsScaling: []
       property bool idleInhibitorEnabled: false
+      property bool tooltipsEnabled: true
     }
 
     // brightness
@@ -308,15 +316,13 @@ Singleton {
       property string predefinedScheme: "Noctalia (default)"
       property bool darkMode: true
       property string matugenSchemeType: "scheme-fruit-salad"
+      property bool generateTemplatesForPredefined: true
     }
 
-    // matugen templates toggles
-    property JsonObject matugen: JsonObject {
-      // Per-template flags to control dynamic config generation
-      property bool gtk4: false
-      property bool gtk3: false
-      property bool qt6: false
-      property bool qt5: false
+    // templates toggles
+    property JsonObject templates: JsonObject {
+      property bool gtk: false
+      property bool qt: false
       property bool kitty: false
       property bool ghostty: false
       property bool foot: false

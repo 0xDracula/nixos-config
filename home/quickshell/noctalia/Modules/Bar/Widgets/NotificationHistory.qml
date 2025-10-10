@@ -10,7 +10,6 @@ import qs.Widgets
 NIconButton {
   id: root
 
-  property ShellScreen screen
   property real scaling: 1.0
 
   // Widget properties passed from Bar.qml for per-instance settings
@@ -62,7 +61,6 @@ NIconButton {
   onClicked: {
     var panel = PanelService.getPanel("notificationHistoryPanel")
     panel?.toggle(this)
-    Settings.data.notifications.lastSeenTs = Time.timestamp * 1000
   }
 
   onRightClicked: Settings.data.notifications.doNotDisturb = !Settings.data.notifications.doNotDisturb

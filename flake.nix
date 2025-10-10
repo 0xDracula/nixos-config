@@ -37,8 +37,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     winboat = {
-      url = "github:TibixDev/winboat";
-      inputs.nixospkgs.follows = "nixpkgs";
+      url = "github:Rexcrazy804/winboat?ref=fix-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs =

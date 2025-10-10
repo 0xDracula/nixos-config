@@ -14,6 +14,8 @@ Item {
   property var windows: []
   property int focusedWindowIndex: -1
 
+  property bool overviewActive: false
+
   // Signals that match the facade interface
   signal workspaceChanged
   signal activeWindowChanged
@@ -127,6 +129,8 @@ Item {
                     handleWindowFocusChanged(event.WindowFocusChanged)
                   } else if (event.WindowLayoutsChanged) {
                     handleWindowLayoutsChanged(event.WindowLayoutsChanged)
+                  } else if (event.OverviewOpenedOrClosed) {
+                    handleOverviewOpenedOrClosed(event.OverviewOpenedOrClosed)
                   }
                 } catch (e) {
                   Logger.error("NiriService", "Error parsing event stream:", e, data)
@@ -227,7 +231,9 @@ Item {
 
         // Only emit activeWindowChanged if the focused window actually changed
         if (oldFocusedIndex !== focusedWindowIndex) {
-          windows[oldFocusedIndex].isFocused = false
+          if (oldFocusedIndex >= 0 && oldFocusedIndex < windows.length) {
+            windows[oldFocusedIndex].isFocused = false
+          }
           activeWindowChanged()
         }
       }
@@ -282,7 +288,7 @@ Item {
       if (focusedId) {
         const newIndex = windows.findIndex(w => w.id === focusedId)
 
-        if (newIndex >= 0) {
+        if (newIndex >= 0 && newIndex < windows.length) {
           windows[newIndex].isFocused = true
         }
 
@@ -316,26 +322,35 @@ Item {
     }
   }
 
-  // Public functions
-  function switchToWorkspace(workspaceId) {
+  function handleOverviewOpenedOrClosed(eventData) {
     try {
-      Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", workspaceId.toString()])
+      overviewActive = eventData.is_open
+      Logger.log("NiriService", "Overview opened or closed:", eventData.is_open)
+    } catch (e) {
+      Logger.error("NiriService", "Error handling OverviewOpenedOrClosed:", e)
+    }
+  }
+
+  // Public functions
+  function switchToWorkspace(workspace) {
+    try {
+      Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", workspace.idx.toString()])
     } catch (e) {
       Logger.error("NiriService", "Failed to switch workspace:", e)
     }
   }
 
-  function focusWindow(windowId) {
+  function focusWindow(window) {
     try {
-      Quickshell.execDetached(["niri", "msg", "action", "focus-window", "--id", windowId.toString()])
+      Quickshell.execDetached(["niri", "msg", "action", "focus-window", "--id", window.id.toString()])
     } catch (e) {
       Logger.error("NiriService", "Failed to switch window:", e)
     }
   }
 
-  function closeWindow(windowId) {
+  function closeWindow(window) {
     try {
-      Quickshell.execDetached(["niri", "msg", "action", "close-window", "--id", windowId.toString()])
+      Quickshell.execDetached(["niri", "msg", "action", "close-window", "--id", window.id.toString()])
     } catch (e) {
       Logger.error("NiriService", "Failed to close window:", e)
     }

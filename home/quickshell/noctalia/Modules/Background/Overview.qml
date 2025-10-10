@@ -11,17 +11,18 @@ Variants {
 
   delegate: Loader {
     required property ShellScreen modelData
-
-    active: CompositorService.isNiri && modelData && Settings.data.wallpaper.enabled
-
     property string wallpaper: ""
 
+    active: CompositorService.isNiri && Settings.data.wallpaper.enabled && modelData
+
     sourceComponent: PanelWindow {
+      id: panelWindow
+
       Component.onCompleted: {
         if (modelData) {
           Logger.log("Overview", "Loading Overview component for Niri on", modelData.name)
         }
-        wallpaper = modelData ? WallpaperService.getWallpaper(modelData.name) : ""
+        setWallpaperInitial()
       }
 
       // External state management
@@ -31,6 +32,17 @@ Variants {
           if (screenName === modelData.name) {
             wallpaper = path
           }
+        }
+      }
+
+      function setWallpaperInitial() {
+        if (!WallpaperService || !WallpaperService.isInitialized) {
+          Qt.callLater(setWallpaperInitial)
+          return
+        }
+        const wallpaperPath = WallpaperService.getWallpaper(modelData.name)
+        if (wallpaperPath && wallpaperPath !== wallpaper) {
+          wallpaper = wallpaperPath
         }
       }
 
@@ -55,6 +67,9 @@ Variants {
         smooth: true
         mipmap: false
         cache: false
+        asynchronous: true
+        // Image is heavily blurred, so might as well save a lot of memory here.
+        sourceSize: Qt.size(1280, 720)
       }
 
       MultiEffect {
@@ -64,12 +79,8 @@ Variants {
         blurEnabled: true
         blur: 0.48
         blurMax: 128
-      }
-
-      // Make the overview darker
-      Rectangle {
-        anchors.fill: parent
-        color: Settings.data.colorSchemes.darkMode ? Qt.alpha(Color.mSurface, Style.opacityMedium) : Qt.alpha(Color.mOnSurface, Style.opacityMedium)
+        colorization: Style.opacityMedium
+        colorizationColor: Settings.data.colorSchemes.darkMode ? Color.mSurface : Color.mOnSurface
       }
     }
   }

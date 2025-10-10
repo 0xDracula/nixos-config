@@ -38,7 +38,6 @@ import qs.Modules.Notification
 import qs.Modules.OSD
 import qs.Modules.Settings
 import qs.Modules.Toast
-import qs.Modules.Tooltip
 import qs.Modules.Wallpaper
 
 ShellRoot {
@@ -60,30 +59,30 @@ ShellRoot {
   }
 
   Connections {
-    target: I18n
+    target: I18n ? I18n : null
     function onTranslationsLoaded() {
       i18nLoaded = true
     }
   }
 
   Connections {
-    target: Settings
+    target: Settings ? Settings : null
     function onSettingsLoaded() {
       settingsLoaded = true
     }
   }
 
-  LazyLoader {
+  Loader {
     active: i18nLoaded && settingsLoaded
 
-    Item {
+    sourceComponent: Item {
       Component.onCompleted: {
         // Save a ref. to our lockScreen so we can access it  easily
         PanelService.lockScreen = lockScreen
 
         Logger.log("Shell", "---------------------------")
         WallpaperService.init()
-        MatugenService.init()
+        AppThemeService.init()
         ColorSchemeService.init()
         BarWidgetRegistry.init()
         LocationService.init()

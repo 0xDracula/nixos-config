@@ -94,7 +94,6 @@
     anki-bin
     fastfetch
 
-    jetbrains.idea-community-bin
     element-desktop
 
     gh
@@ -150,7 +149,7 @@
     winetricks
 
     todoist-electron
-    inputs.winboat.packages.${pkgs.system}.winboat
-    okular
+    #inputs.winboat.packages.${pkgs.system}.winboat
+    kdePackages.okular
   ];
 }
