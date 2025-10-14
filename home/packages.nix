@@ -151,5 +151,6 @@
     todoist-electron
     #inputs.winboat.packages.${pkgs.system}.winboat
     kdePackages.okular
+    inputs.vicinae.packages.${pkgs.system}.default
   ];
 }

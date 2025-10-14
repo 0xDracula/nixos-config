@@ -186,7 +186,7 @@
     material-symbols
     inter
     fira-code
-
+    riseup-vpn
     ddcutil
     libsForQt5.qt5ct
     kdePackages.qt6ct
@@ -203,7 +203,7 @@
     cliphist
     papirus-icon-theme
     kdePackages.polkit-kde-agent-1
-    niriswitcher
+    udiskie
   ];
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;

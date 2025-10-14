@@ -40,6 +40,10 @@
       url = "github:Rexcrazy804/winboat?ref=fix-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    vicinae = {
+      url = "github:vicinaehq/vicinae";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs =
     {

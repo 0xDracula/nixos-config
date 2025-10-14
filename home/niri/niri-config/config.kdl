@@ -280,6 +280,7 @@ layout {
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
 spawn-at-startup "swww-daemon"
+spawn-at-startup "vicinae" "server"
 spawn-at-startup "qs -c noctalia"
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
@@ -382,7 +383,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
-    Mod+D hotkey-overlay-title="Run an Application: quickshell" { spawn "qs" "-c" "noctalia" "ipc" "call" "launcher" "toggle"; }
+    Mod+D hotkey-overlay-title="Run an Application: quickshell" { spawn "vicinae" "toggle"; }
     Super+L hotkey-overlay-title="Lock the Screen: quickshell" { spawn "qs" "-c" "noctalia" "ipc" "call" "lockScreen" "toggle"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
